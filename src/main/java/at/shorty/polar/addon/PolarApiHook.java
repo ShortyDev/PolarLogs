@@ -26,7 +26,6 @@ public class PolarApiHook implements Runnable {
 
     @Override
     public void run() {
-
         try {
             PolarApi polarApi = PolarApiAccessor.access().get();
             polarApi.events().repository().registerListener(MitigationEvent.class, mitigationEvent -> {
