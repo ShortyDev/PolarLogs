@@ -25,9 +25,9 @@ This is an example of the default config for the mitigation message. The details
 ### Rate Limit (IMPORTANT)
 
 Discord has a rate limit on webhooks, which means that a lot of messages on the same webhook most likely won't be sent.
-This is why it is recommended to create a new webhook for each type of message (mitigation, detection, ...). If you want
-to use the same webhook for all types of messages, you can set a cooldown for each player and type in the config. This
-will prevent a player from spamming the webhook.
+This is why it is recommended to create a new webhook for each type of message (mitigation, detection, ...). You can
+also optionally set the `cooldown_per_player_and_type` field to a higher value to prevent the plugin from sending too
+many messages. For mitigations, the default value of this field is `5` seconds.
 
 #### Global rate limit
 
