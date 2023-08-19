@@ -14,6 +14,7 @@ public class Detection {
     private boolean enabled;
     private int cooldownPerPlayerAndType;
     private String[] notifications;
+    private String[] detailFilters;
     private String content;
     private Embed[] embeds;
 
@@ -31,6 +32,7 @@ public class Detection {
         detection.setEnabled(section.getBoolean("enabled"));
         detection.setCooldownPerPlayerAndType(section.getInt("cooldown_per_player_and_type"));
         detection.setNotifications(section.getStringList("notifications").toArray(new String[0]));
+        detection.setDetailFilters(section.getStringList("filter_detail_lines").toArray(new String[0]));
         detection.setContent(section.getString("content"));
         detection.setEmbeds(new Embed[]{Embed.loadFromConfigSection(section.getConfigurationSection("embed"))});
         return detection;

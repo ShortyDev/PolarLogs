@@ -14,6 +14,7 @@ public class Mitigation {
     private boolean enabled;
     private int cooldownPerPlayerAndType;
     private String[] notifications;
+    private String[] detailFilters;
     private String content;
     private Embed[] embeds;
 
@@ -31,6 +32,7 @@ public class Mitigation {
         mitigation.setEnabled(section.getBoolean("enabled"));
         mitigation.setCooldownPerPlayerAndType(section.getInt("cooldown_per_player_and_type"));
         mitigation.setNotifications(section.getStringList("notifications").toArray(new String[0]));
+        mitigation.setDetailFilters(section.getStringList("filter_detail_lines").toArray(new String[0]));
         mitigation.setContent(section.getString("content"));
         mitigation.setEmbeds(new Embed[]{Embed.loadFromConfigSection(section.getConfigurationSection("embed"))});
         return mitigation;

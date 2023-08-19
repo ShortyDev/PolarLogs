@@ -4,6 +4,7 @@ This is a simple webhook plugin for Polar Anticheat. You can configure everythin
 
 ## Config
 ```yml
+webhook_url: "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
 # Placeholders
 # Mitigation: %PLAYER_NAME%, %VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
 # Detection: %PLAYER_NAME%, %VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
@@ -23,6 +24,9 @@ mitigation:
     - 'BLOCK_INTERACT'
     - 'PHASE'
     - 'CLOUD'
+  filter_detail_lines: # Allows you to filter out certain detail lines from being sent to Discord
+    - 'Click to teleport'
+    - 'Debug*' # Line starting with "Debug" will be filtered out
   content: 'Player %PLAYER_NAME% was mitigated for %VL% violations of %CHECK_TYPE% - %CHECK_NAME%'
   embed:
     title: 'Polar - Mitigation'
@@ -62,6 +66,9 @@ detection:
     - 'BLOCK_INTERACT'
     - 'PHASE'
     - 'CLOUD'
+  filter_detail_lines: # Allows you to filter out certain detail lines from being sent to Discord
+    - 'Click to teleport'
+    - 'Debug*' # Line starting with "Debug" will be filtered out
   content: 'Player %PLAYER_NAME% detected for %CHECK_TYPE% - %CHECK_NAME%'
   embed:
     title: 'Polar - Detection'
@@ -99,6 +106,9 @@ cloud_detection: # Please note that %VL% and %CHECK_NAME% are not available for 
     - 'SCAFFOLD'
     - 'CPS_LIMIT'
     - 'RIGHT_CPS_LIMIT'
+  filter_detail_lines: # Allows you to filter out certain detail lines from being sent to Discord
+    - 'Click to teleport'
+    - 'Debug*' # Line starting with "Debug" will be filtered out
   content: '[Cloud] Player %PLAYER_NAME% detected for %CHECK_TYPE%'
   embed:
     title: 'Polar - Detection'

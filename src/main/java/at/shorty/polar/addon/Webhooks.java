@@ -15,6 +15,7 @@ import top.polar.api.loader.LoaderApi;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -51,16 +52,50 @@ public class Webhooks extends JavaPlugin {
         }
     }
 
-    public static String replacePlaceholders(String input, String playerName, String vl, String checkType, String checkName, String details, String punishment, String reason) {
+    public static String replacePlaceholders(String input, String playerName, String vl, String checkType, String checkName, String details, String punishment, String reason, String[] detailFilters) {
         if (punishment == null) punishment = "Punishment";
+        if (detailFilters != null && detailFilters.length > 0) {
+            String[] lines = details.split("\n");
+            StringBuilder builder = new StringBuilder();
+            for (String line : lines) {
+                if (line.isEmpty()) continue;
+                line = ChatColor.translateAlternateColorCodes('&', line);
+                line = ChatColor.stripColor(line);
+                line = Pattern.compile("<(.*?)>").matcher(line).replaceAll("");
+                line = line.trim();
+                boolean filter = false;
+                for (String filterLine : detailFilters) {
+                    if (filterLine.startsWith("*") && filterLine.endsWith("*")) {
+                        if (line.contains(filterLine.replace("*", ""))) {
+                            filter = true;
+                            break;
+                        }
+                    } else if (filterLine.startsWith("*")) {
+                        if (line.endsWith(filterLine.replace("*", ""))) {
+                            filter = true;
+                            break;
+                        }
+                    } else if (filterLine.endsWith("*")) {
+                        if (line.startsWith(filterLine.replace("*", ""))) {
+                            filter = true;
+                            break;
+                        }
+                    } else {
+                        if (line.equals(filterLine)) {
+                            filter = true;
+                            break;
+                        }
+                    }
+                }
+                if (!filter) builder.append(line).append("\n");
+            }
+            details = builder.toString();
+        }
         details = details.replace("\n", "\\n").trim();
-        details = ChatColor.translateAlternateColorCodes('&', details);
-        details = ChatColor.stripColor(details);
-        details = Pattern.compile("\"<(.*?)>\"").matcher(details).replaceAll("");
         reason = reason.replace("\n", "\\n").trim();
         reason = ChatColor.translateAlternateColorCodes('&', reason);
         reason = ChatColor.stripColor(reason);
-        reason = Pattern.compile("\"<(.*?)>\"").matcher(reason).replaceAll("");
+        reason = Pattern.compile("<(.*?)>").matcher(reason).replaceAll("");
         return input.replace("%PLAYER_NAME%", playerName)
                 .replace("%VL%", vl)
                 .replace("%CHECK_TYPE%", checkType)

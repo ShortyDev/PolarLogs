@@ -14,6 +14,7 @@ public class CloudDetection {
     private boolean enabled;
     private int cooldownPerPlayerAndType;
     private String[] notifications;
+    private String[] detailFilters;
     private String content;
     private Embed[] embeds;
 
@@ -31,6 +32,7 @@ public class CloudDetection {
         cloudDetection.setEnabled(section.getBoolean("enabled"));
         cloudDetection.setCooldownPerPlayerAndType(section.getInt("cooldown_per_player_and_type"));
         cloudDetection.setNotifications(section.getStringList("notifications").toArray(new String[0]));
+        cloudDetection.setDetailFilters(section.getStringList("filter_detail_lines").toArray(new String[0]));
         cloudDetection.setContent(section.getString("content"));
         cloudDetection.setEmbeds(new Embed[]{Embed.loadFromConfigSection(section.getConfigurationSection("embed"))});
         return cloudDetection;

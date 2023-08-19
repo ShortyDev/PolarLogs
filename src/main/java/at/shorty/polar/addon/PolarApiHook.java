@@ -49,7 +49,8 @@ public class PolarApiHook implements Runnable {
                         mitigationEvent.check().name(),
                         mitigationEvent.details(),
                         "",
-                        "");
+                        "",
+                        mitigation.getDetailFilters());
                 Webhooks.sendWebhook(mitigation.getWebhookUrl(), content);
             });
             polarApi.events().repository().registerListener(DetectionAlertEvent.class, detectionAlertEvent -> {
@@ -70,7 +71,8 @@ public class PolarApiHook implements Runnable {
                         detectionAlertEvent.check().name(),
                         detectionAlertEvent.details(),
                         "",
-                        "");
+                        "",
+                        detection.getDetailFilters());
                 Webhooks.sendWebhook(detection.getWebhookUrl(), content);
             });
             polarApi.events().repository().registerListener(CloudDetectionEvent.class, cloudDetectionEvent -> {
@@ -91,7 +93,8 @@ public class PolarApiHook implements Runnable {
                         "",
                         cloudDetectionEvent.details(),
                         "",
-                        "");
+                        "",
+                        cloudDetection.getDetailFilters());
                 Webhooks.sendWebhook(cloudDetection.getWebhookUrl(), content);
             });
             polarApi.events().repository().registerListener(PunishmentEvent.class, punishmentEvent -> {
@@ -105,7 +108,8 @@ public class PolarApiHook implements Runnable {
                         "",
                         "",
                         punishmentEvent.type().name(),
-                        punishmentEvent.reason());
+                        punishmentEvent.reason(),
+                        new String[0]);
                 Webhooks.sendWebhook(punishment.getWebhookUrl(), content);
             });
         } catch (PolarNotLoadedException e) {
