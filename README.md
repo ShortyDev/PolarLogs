@@ -7,6 +7,7 @@ This is a simple webhook plugin for Polar Anticheat. You can configure everythin
 # Placeholders
 # Mitigation: %PLAYER_NAME%, %VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
 # Detection: %PLAYER_NAME%, %VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
+# Cloud Detection: %PLAYER_NAME%, %CHECK_TYPE%, %DETAILS%
 # Punishment: %PLAYER_NAME%, %PUNISHMENT%, %REASON%
 mitigation:
   webhook_url: "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
