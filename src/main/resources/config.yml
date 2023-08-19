@@ -3,7 +3,7 @@
 # Mitigation: %VL%, %PUNISH_VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
 # Detection: %VL%, %PUNISH_VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
 # Cloud Detection: %CHECK_TYPE%, %DETAILS%
-# Punishment: %PLAYER_NAME%, %PUNISHMENT%, %REASON%
+# Punishment: %PUNISHMENT%, %REASON%
 mitigation:
   webhook_url: "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
   enabled: true
