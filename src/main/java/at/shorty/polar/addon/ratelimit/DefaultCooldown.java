@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class DefaultCooldown {
 
     @Setter
-    private Map<String, Object> cache;
+    private transient Map<String, Object> cache;
 
     public void initializeCache(int time, TimeUnit timeUnit) {
         if (cache != null) throw new IllegalStateException("Cache already initialized");
