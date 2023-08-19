@@ -175,7 +175,7 @@ cloud_detection: # Please note that %VL% and %CHECK_NAME% are not available for 
         inline: true
       1:
         name: 'Check'
-        value: '%CHECK_TYPE% - %CHECK_NAME%'
+        value: '%CHECK_TYPE%'
         inline: true
       2:
         name: 'Details'
