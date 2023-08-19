@@ -5,6 +5,7 @@ import at.shorty.polar.addon.config.Detection;
 import at.shorty.polar.addon.config.Mitigation;
 import at.shorty.polar.addon.config.Punishment;
 import net.jodah.expiringmap.ExpiringMap;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
@@ -15,6 +16,7 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 
 @Plugin(name = "PolarWebhooks", version = "1.0")
@@ -52,6 +54,14 @@ public class Webhooks extends JavaPlugin {
 
     public static String replacePlaceholders(String input, String playerName, String vl, String checkType, String checkName, String details, String punishment, String reason) {
         if (punishment == null) punishment = "Punishment";
+        details = details.replace("\n", "\\n").trim();
+        details = ChatColor.translateAlternateColorCodes('&', details);
+        details = ChatColor.stripColor(details);
+        details = Pattern.compile("\"<(.*?)>\"").matcher(details).replaceAll("");
+        reason = reason.replace("\n", "\\n").trim();
+        reason = ChatColor.translateAlternateColorCodes('&', reason);
+        reason = ChatColor.stripColor(reason);
+        reason = Pattern.compile("\"<(.*?)>\"").matcher(reason).replaceAll("");
         return input.replace("%PLAYER_NAME%", playerName)
                 .replace("%VL%", vl)
                 .replace("%CHECK_TYPE%", checkType)
