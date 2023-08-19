@@ -8,7 +8,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import top.polar.api.user.event.type.CloudCheckType;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @EqualsAndHashCode(callSuper = true)
@@ -20,14 +19,9 @@ public class CloudDetection extends DiscordWebhook {
     private transient int cooldownPerPlayerAndType;
     private transient String[] notifications;
     private transient String[] detailFilters;
-    private transient Map<String, Long> cooldownCache;
 
     public boolean isNotificationEnabled(CloudCheckType checkType) {
         return Arrays.stream(notifications).anyMatch(s -> s.equalsIgnoreCase(checkType.name()));
-    }
-
-    public void initCache(Map<String, Long> cooldownCache) {
-        this.cooldownCache = cooldownCache;
     }
 
     public static CloudDetection loadFromConfigSection(ConfigurationSection section) {
