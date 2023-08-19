@@ -26,7 +26,7 @@ mitigation:
     - 'CLOUD'
   filter_detail_lines: # Allows you to filter out certain detail lines from being sent to Discord
     - 'Click to teleport'
-    - 'Debug*' # Line starting with "Debug" will be filtered out
+    - 'Debug*' # Lines starting with "Debug" will be filtered out
   content: 'Player %PLAYER_NAME% was mitigated for %VL% violations of %CHECK_TYPE% - %CHECK_NAME%'
   embed:
     title: 'Polar - Mitigation'
@@ -68,7 +68,7 @@ detection:
     - 'CLOUD'
   filter_detail_lines: # Allows you to filter out certain detail lines from being sent to Discord
     - 'Click to teleport'
-    - 'Debug*' # Line starting with "Debug" will be filtered out
+    - 'Debug*' # Lines starting with "Debug" will be filtered out
   content: 'Player %PLAYER_NAME% detected for %CHECK_TYPE% - %CHECK_NAME%'
   embed:
     title: 'Polar - Detection'
@@ -108,7 +108,7 @@ cloud_detection: # Please note that %VL% and %CHECK_NAME% are not available for 
     - 'RIGHT_CPS_LIMIT'
   filter_detail_lines: # Allows you to filter out certain detail lines from being sent to Discord
     - 'Click to teleport'
-    - 'Debug*' # Line starting with "Debug" will be filtered out
+    - 'Debug*' # Lines starting with "Debug" will be filtered out
   content: '[Cloud] Player %PLAYER_NAME% detected for %CHECK_TYPE%'
   embed:
     title: 'Polar - Detection'
