@@ -12,7 +12,7 @@ This is an example of the default config for the mitigation message. The details
 ## Config
 
 ### Cooldown per player and type
-The cooldown per player and type field allows you to set a cooldown for each player and check type. This is useful for preventing a player from spamming the webhook. For example, if you set the cooldown to 5 seconds, the plugin will not send any notifications of that type for that player until 5 seconds have passed. If you set the cooldown to 0, the plugin will not send any notifications of that type for that player until the cooldown expired.
+The cooldown per player and type field allows you to set a cooldown for each player and check type. This is useful for preventing a player from spamming the webhook. For example, if you set the cooldown to 5 seconds, the plugin will not send any notifications of that type for that player until 5 seconds have passed. A cooldown of 0 means that there is no cooldown.
 
 ### Notifications field
 The notification list should contain all types of checks that you want to receive alerts for. By default, all checks are enabled. If you want to disable a check, simply remove it from the list.
