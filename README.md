@@ -4,12 +4,12 @@ This is a simple webhook plugin for Polar Anticheat. You can configure everythin
 
 ## Config
 ```yml
-webhook_url: "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
 # Placeholders
 # Mitigation: %PLAYER_NAME%, %VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
 # Detection: %PLAYER_NAME%, %VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
 # Punishment: %PLAYER_NAME%, %PUNISHMENT%, %REASON%
 mitigation:
+  webhook_url: "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
   enabled: true
   cooldown_per_player_and_type: 5 # Seconds
   notifications:
@@ -31,7 +31,7 @@ mitigation:
       text: 'Polar Webhooks by Shorty'
       icon_url: ''
     thumbnail:
-      url: ''
+      url: 'https://mc-heads.net/avatar/%PLAYER_NAME%'
     image:
       url: ''
     fields:
@@ -48,6 +48,7 @@ mitigation:
         value: '%DETAILS%'
         inline: false
 detection:
+  webhook_url: "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
   enabled: true
   cooldown_per_player_and_type: 0 # Seconds
   notifications:
@@ -69,7 +70,7 @@ detection:
       text: 'Polar Webhooks by Shorty'
       icon_url: ''
     thumbnail:
-      url: ''
+      url: 'https://mc-heads.net/avatar/%PLAYER_NAME%'
     image:
       url: ''
     fields:
@@ -86,6 +87,7 @@ detection:
         value: '%DETAILS%'
         inline: false
 cloud_detection: # Please note that %VL% and %CHECK_NAME% are not available for cloud detections
+  webhook_url: "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
   enabled: true
   cooldown_per_player_and_type: 0 # Seconds
   notifications:
@@ -105,7 +107,7 @@ cloud_detection: # Please note that %VL% and %CHECK_NAME% are not available for 
       text: 'Polar Webhooks by Shorty'
       icon_url: ''
     thumbnail:
-      url: ''
+      url: 'https://mc-heads.net/avatar/%PLAYER_NAME%'
     image:
       url: ''
     fields:
@@ -122,6 +124,7 @@ cloud_detection: # Please note that %VL% and %CHECK_NAME% are not available for 
         value: '%DETAILS%'
         inline: false
 punishment: # Please note that no other placeholders except for %PLAYER_NAME%, %PUNISHMENT% and %REASON% are available for punishments
+  webhook_url: "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
   enabled: true
   types_enabled: # Remove from list to disable notifications for that punishment type
     - 'BAN'
@@ -136,7 +139,7 @@ punishment: # Please note that no other placeholders except for %PLAYER_NAME%, %
       text: 'Polar Webhooks by Shorty'
       icon_url: ''
     thumbnail:
-      url: ''
+      url: 'https://mc-heads.net/avatar/%PLAYER_NAME%'
     image:
       url: ''
     fields:

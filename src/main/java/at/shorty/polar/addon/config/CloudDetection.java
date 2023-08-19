@@ -10,6 +10,7 @@ import java.util.Arrays;
 @Data
 public class CloudDetection {
 
+    private String webhookUrl;
     private boolean enabled;
     private int cooldownPerPlayerAndType;
     private String[] notifications;
@@ -26,6 +27,7 @@ public class CloudDetection {
 
     public static CloudDetection loadFromConfigSection(ConfigurationSection section) {
         CloudDetection cloudDetection = new CloudDetection();
+        cloudDetection.setWebhookUrl(section.getString("webhook_url"));
         cloudDetection.setEnabled(section.getBoolean("enabled"));
         cloudDetection.setCooldownPerPlayerAndType(section.getInt("cooldown_per_player_and_type"));
         cloudDetection.setNotifications(section.getStringList("notifications").toArray(new String[0]));

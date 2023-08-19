@@ -27,12 +27,11 @@ public class Webhooks extends JavaPlugin {
     public void onLoad() {
         saveDefaultConfig();
         YamlConfiguration config = (YamlConfiguration) getConfig();
-        String webhookUrl = config.getString("webhook_url");
         Mitigation mitigation = Mitigation.loadFromConfigSection(config.getConfigurationSection("mitigation"));
         Detection detection = Detection.loadFromConfigSection(config.getConfigurationSection("detection"));
         CloudDetection cloudDetection = CloudDetection.loadFromConfigSection(config.getConfigurationSection("cloud_detection"));
         Punishment punishment = Punishment.loadFromConfigSection(config.getConfigurationSection("punishment"));
-        LoaderApi.registerEnableCallback(new PolarApiHook(webhookUrl, mitigation, detection, cloudDetection, punishment, ExpiringMap.builder().expiration(2, TimeUnit.MINUTES).build()));
+        LoaderApi.registerEnableCallback(new PolarApiHook(mitigation, detection, cloudDetection, punishment, ExpiringMap.builder().expiration(2, TimeUnit.MINUTES).build()));
     }
 
     public static void sendWebhook(String webhookUrl, String content) {

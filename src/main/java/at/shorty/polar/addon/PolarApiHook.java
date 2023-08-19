@@ -20,7 +20,6 @@ import java.util.Map;
 @Getter
 public class PolarApiHook implements Runnable {
 
-    private String webhookUrl;
     private Mitigation mitigation;
     private Detection detection;
     private CloudDetection cloudDetection;
@@ -51,7 +50,7 @@ public class PolarApiHook implements Runnable {
                         mitigationEvent.details(),
                         "",
                         "");
-                Webhooks.sendWebhook(webhookUrl, content);
+                Webhooks.sendWebhook(mitigation.getWebhookUrl(), content);
             });
             polarApi.events().repository().registerListener(DetectionAlertEvent.class, detectionAlertEvent -> {
                 if (!detection.isEnabled()) return;
@@ -72,7 +71,7 @@ public class PolarApiHook implements Runnable {
                         detectionAlertEvent.details(),
                         "",
                         "");
-                Webhooks.sendWebhook(webhookUrl, content);
+                Webhooks.sendWebhook(detection.getWebhookUrl(), content);
             });
             polarApi.events().repository().registerListener(CloudDetectionEvent.class, cloudDetectionEvent -> {
                 if (!cloudDetection.isEnabled()) return;
@@ -93,7 +92,7 @@ public class PolarApiHook implements Runnable {
                         cloudDetectionEvent.details(),
                         "",
                         "");
-                Webhooks.sendWebhook(webhookUrl, content);
+                Webhooks.sendWebhook(cloudDetection.getWebhookUrl(), content);
             });
             polarApi.events().repository().registerListener(PunishmentEvent.class, punishmentEvent -> {
                 if (!punishment.isEnabled()) return;
@@ -107,7 +106,7 @@ public class PolarApiHook implements Runnable {
                         "",
                         punishmentEvent.type().name(),
                         punishmentEvent.reason());
-                Webhooks.sendWebhook(webhookUrl, content);
+                Webhooks.sendWebhook(punishment.getWebhookUrl(), content);
             });
         } catch (PolarNotLoadedException e) {
             throw new RuntimeException(e);

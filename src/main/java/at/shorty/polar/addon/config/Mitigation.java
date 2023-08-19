@@ -10,6 +10,7 @@ import java.util.Arrays;
 @Data
 public class Mitigation {
 
+    private String webhookUrl;
     private boolean enabled;
     private int cooldownPerPlayerAndType;
     private String[] notifications;
@@ -26,6 +27,7 @@ public class Mitigation {
 
     public static Mitigation loadFromConfigSection(ConfigurationSection section) {
         Mitigation mitigation = new Mitigation();
+        mitigation.setWebhookUrl(section.getString("webhook_url"));
         mitigation.setEnabled(section.getBoolean("enabled"));
         mitigation.setCooldownPerPlayerAndType(section.getInt("cooldown_per_player_and_type"));
         mitigation.setNotifications(section.getStringList("notifications").toArray(new String[0]));

@@ -7,6 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 @Data
 public class Punishment {
 
+    private String webhookUrl;
     private boolean enabled;
     private String[] typesEnabled;
     private int cooldownPerPlayer;
@@ -19,6 +20,7 @@ public class Punishment {
 
     public static Punishment loadFromConfigSection(ConfigurationSection section) {
         Punishment punishment = new Punishment();
+        punishment.setWebhookUrl(section.getString("webhook_url"));
         punishment.setEnabled(section.getBoolean("enabled"));
         punishment.setTypesEnabled(section.getStringList("types_enabled").toArray(new String[0]));
         punishment.setCooldownPerPlayer(section.getInt("cooldown_per_player"));

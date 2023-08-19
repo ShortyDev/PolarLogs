@@ -10,6 +10,7 @@ import java.util.Arrays;
 @Data
 public class Detection {
 
+    private String webhookUrl;
     private boolean enabled;
     private int cooldownPerPlayerAndType;
     private String[] notifications;
@@ -26,6 +27,7 @@ public class Detection {
 
     public static Detection loadFromConfigSection(ConfigurationSection section) {
         Detection detection = new Detection();
+        detection.setWebhookUrl(section.getString("webhook_url"));
         detection.setEnabled(section.getBoolean("enabled"));
         detection.setCooldownPerPlayerAndType(section.getInt("cooldown_per_player_and_type"));
         detection.setNotifications(section.getStringList("notifications").toArray(new String[0]));
