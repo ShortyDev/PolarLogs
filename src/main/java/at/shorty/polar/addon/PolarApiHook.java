@@ -5,7 +5,6 @@ import at.shorty.polar.addon.config.Detection;
 import at.shorty.polar.addon.config.Mitigation;
 import at.shorty.polar.addon.config.Punishment;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import top.polar.api.PolarApi;
 import top.polar.api.PolarApiAccessor;
 import top.polar.api.exception.PolarNotLoadedException;
@@ -17,7 +16,6 @@ import top.polar.api.user.event.PunishmentEvent;
 import java.util.Map;
 
 @AllArgsConstructor
-@Getter
 public class PolarApiHook implements Runnable {
 
     private Mitigation mitigation;
