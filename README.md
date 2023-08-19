@@ -1,4 +1,4 @@
-# Polar webhooks
+# Polar Webhooks
 
 This is a simple webhook plugin for [Polar Anticheat](https://polar.top). It allows you to send notifications to a Discord channel when a player is mitigated, detected or punished.
 
@@ -8,6 +8,31 @@ If you have any suggestions, feel free to open an issue or a pull request.
 This is an example of the default config for the mitigation message. The details field has been filtered using the `filter_detail_lines` field.
 
 ![Example](assets/default_mitigation.png)
+
+## Download
+
+[Github Releases](https://github.com/ShortyDev/PolarWebhooks/releases)
+
+## How to create a webhook
+
+1. Navigate to your Discord server
+2. Open the settings of the channel you want to send the notifications to
+3. Click on `Integrations`
+4. Click on `Create Webhook` or `View Webhooks` and then `New Webhook` if you already have other webhooks
+5. Enter a name for the webhook and optionally change the avatar
+6. Copy the webhook URL and paste it into the config
+
+### Rate Limit (IMPORTANT)
+
+Discord has a rate limit on webhooks, which means that a lot of messages on the same webhook most likely won't be sent.
+This is why it is recommended to create a new webhook for each type of message (mitigation, detection, ...). If you want
+to use the same webhook for all types of messages, you can set a cooldown for each player and type in the config. This
+will prevent a player from spamming the webhook.
+
+#### Global rate limit
+
+The global rate limit is 50 messages per second. This means you can't exceed 50 messages per second from a single IP
+address.
 
 ## Config
 
