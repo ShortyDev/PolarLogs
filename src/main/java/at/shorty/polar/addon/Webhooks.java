@@ -7,17 +7,20 @@ import at.shorty.polar.addon.config.Punishment;
 import net.jodah.expiringmap.ExpiringMap;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import top.polar.api.loader.LoaderApi;
+import top.polar.api.user.User;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
 
 @Plugin(name = "PolarWebhooks", version = "1.0")
 @Dependency("PolarLoader")
@@ -51,7 +54,7 @@ public class Webhooks extends JavaPlugin {
         }
     }
 
-    public static String replacePlaceholders(String input, String playerName, String vl, String punishVl, String checkType, String checkName, String details, String punishment, String reason, String[] detailFilters) {
+    public static String replacePlaceholders(String input, User user, String vl, String punishVl, String checkType, String checkName, String details, String punishment, String reason, String[] detailFilters) {
         if (punishment == null) punishment = "Punishment";
         if (detailFilters != null && detailFilters.length > 0) {
             String[] lines = details.split("\n");
@@ -95,12 +98,21 @@ public class Webhooks extends JavaPlugin {
         reason = ChatColor.translateAlternateColorCodes('&', reason);
         reason = ChatColor.stripColor(reason);
         reason = Pattern.compile("<(.*?)>").matcher(reason).replaceAll("");
-        return input.replace("%PLAYER_NAME%", playerName)
+        Player bukkitPlayer = user.bukkitPlayer().orElse(null);
+        return input.replace("%PLAYER_NAME%", user.username())
+                .replace("%PLAYER_UUID%", user.uuid().toString())
+                .replace("%PLAYER_LATENCY%", String.valueOf(user.connection().latency()))
+                .replace("%PLAYER_IP%", bukkitPlayer != null ? bukkitPlayer.getAddress().getAddress().getHostAddress() : "Unknown")
+                .replace("%PLAYER_PROTOCOL_VERSION%", String.valueOf(user.clientVersion().protocolVersion()))
+                .replace("%PLAYER_CLIENT_VERSION_NAME%", user.clientVersion().name())
+                .replace("%PLAYER_CLIENT_BRAND%", user.clientVersion().brand())
                 .replace("%VL%", vl)
                 .replace("%PUNISH_VL%", punishVl)
                 .replace("%CHECK_TYPE%", checkType)
                 .replace("%CHECK_NAME%", checkName)
                 .replace("%DETAILS%", details)
+                .replace("%TIMESTAMP%", Instant.now().atZone(ZoneOffset.UTC).toString())
+                .replace("%TIMESTAMP_UNIX%", String.valueOf(Instant.now().getEpochSecond()))
                 .replace("%PUNISHMENT%", punishment)
                 .replace("%REASON%", reason);
     }

@@ -44,7 +44,7 @@ public class PolarApiHook implements Runnable {
                 int iPunishVl = (int) punishVl;
                 String content = Webhooks.replacePlaceholders(
                         mitigation.renderJson(),
-                        mitigationEvent.user().username(),
+                        mitigationEvent.user(),
                         mitigation.isRoundVl() ? String.valueOf(iVl) : String.valueOf(vl),
                         mitigation.isRoundVl() ? String.valueOf(iPunishVl) : String.valueOf(punishVl),
                         mitigationEvent.check().type().name(),
@@ -71,7 +71,7 @@ public class PolarApiHook implements Runnable {
                 int iPunishVl = (int) punishVl;
                 String content = Webhooks.replacePlaceholders(
                         detection.renderJson(),
-                        detectionAlertEvent.user().username(),
+                        detectionAlertEvent.user(),
                         detection.isRoundVl() ? String.valueOf(iVl) : String.valueOf(vl),
                         detection.isRoundVl() ? String.valueOf(iPunishVl) : String.valueOf(punishVl),
                         detectionAlertEvent.check().type().name(),
@@ -94,7 +94,7 @@ public class PolarApiHook implements Runnable {
                 }
                 String content = Webhooks.replacePlaceholders(
                         cloudDetection.renderJson(),
-                        cloudDetectionEvent.user().username(),
+                        cloudDetectionEvent.user(),
                         "",
                         "",
                         cloudDetectionEvent.cloudCheckType().name(),
@@ -110,7 +110,7 @@ public class PolarApiHook implements Runnable {
                 if (!String.join("", punishment.getTypesEnabled()).contains(punishmentEvent.type().name())) return;
                 String content = Webhooks.replacePlaceholders(
                         punishment.renderJson(),
-                        punishmentEvent.user().username(),
+                        punishmentEvent.user(),
                         "",
                         "",
                         "",
@@ -125,4 +125,5 @@ public class PolarApiHook implements Runnable {
             throw new RuntimeException(e);
         }
     }
+
 }

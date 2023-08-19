@@ -13,6 +13,7 @@ public class Embed {
     private Footer footer;
     private Thumbnail thumbnail;
     private Image image;
+    private String timestamp;
     private Field[] fields;
 
     public static Embed loadFromConfigSection(ConfigurationSection configurationSection) {
@@ -23,6 +24,7 @@ public class Embed {
         Footer footer = new Footer(configurationSection.getString("footer.text"), configurationSection.getString("footer.icon_url"));
         Thumbnail thumbnail = new Thumbnail(configurationSection.getString("thumbnail.url"));
         Image image = new Image(configurationSection.getString("image.url"));
+        embed.setTimestamp(configurationSection.getString("timestamp"));
         Field[] fields = new Field[configurationSection.getConfigurationSection("fields").getKeys(false).size()];
         int i = 0;
         for (String key : configurationSection.getConfigurationSection("fields").getKeys(false)) {

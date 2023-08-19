@@ -22,9 +22,10 @@ The detail line filter allows you to filter out certain detail lines from being 
 
 ```yml
 # Placeholders
-# Mitigation: %PLAYER_NAME%, %VL%, %PUNISH_VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
-# Detection: %PLAYER_NAME%, %VL%, %PUNISH_VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
-# Cloud Detection: %PLAYER_NAME%, %CHECK_TYPE%, %DETAILS%
+# Global: %PLAYER_NAME%, %PLAYER_UUID%, %PLAYER_PROTOCOL_VERSION%, %PLAYER_LATENCY%, %PLAYER_IP%, %PLAYER_CLIENT_VERSION_NAME%, %PLAYER_CLIENT_BRAND%, %TIMESTAMP% (current time in RFC-3339 format), %TIMESTAMP_UNIX% (current time in Unix format)
+# Mitigation: %VL%, %PUNISH_VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
+# Detection: %VL%, %PUNISH_VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
+# Cloud Detection: %CHECK_TYPE%, %DETAILS%
 # Punishment: %PLAYER_NAME%, %PUNISHMENT%, %REASON%
 mitigation:
   webhook_url: "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
@@ -56,6 +57,7 @@ mitigation:
       url: 'https://mc-heads.net/avatar/%PLAYER_NAME%'
     image:
       url: ''
+    timestamp: '%TIMESTAMP%'
     fields:
       0:
         name: 'Player'
@@ -99,6 +101,7 @@ detection:
       url: 'https://mc-heads.net/avatar/%PLAYER_NAME%'
     image:
       url: ''
+    timestamp: '%TIMESTAMP%'
     fields:
       0:
         name: 'Player'
@@ -139,6 +142,7 @@ cloud_detection: # Please note that %VL% and %CHECK_NAME% are not available for 
       url: 'https://mc-heads.net/avatar/%PLAYER_NAME%'
     image:
       url: ''
+    timestamp: '%TIMESTAMP%'
     fields:
       0:
         name: 'Player'
@@ -171,6 +175,7 @@ punishment: # Please note that no other placeholders except for %PLAYER_NAME%, %
       url: 'https://mc-heads.net/avatar/%PLAYER_NAME%'
     image:
       url: ''
+    timestamp: '%TIMESTAMP%'
     fields:
       0:
         name: 'Player'
