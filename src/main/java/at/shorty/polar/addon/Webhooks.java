@@ -15,7 +15,6 @@ import top.polar.api.loader.LoaderApi;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -52,7 +51,7 @@ public class Webhooks extends JavaPlugin {
         }
     }
 
-    public static String replacePlaceholders(String input, String playerName, String vl, String checkType, String checkName, String details, String punishment, String reason, String[] detailFilters) {
+    public static String replacePlaceholders(String input, String playerName, String vl, String punishVl, String checkType, String checkName, String details, String punishment, String reason, String[] detailFilters) {
         if (punishment == null) punishment = "Punishment";
         if (detailFilters != null && detailFilters.length > 0) {
             String[] lines = details.split("\n");
@@ -98,6 +97,7 @@ public class Webhooks extends JavaPlugin {
         reason = Pattern.compile("<(.*?)>").matcher(reason).replaceAll("");
         return input.replace("%PLAYER_NAME%", playerName)
                 .replace("%VL%", vl)
+                .replace("%PUNISH_VL%", punishVl)
                 .replace("%CHECK_TYPE%", checkType)
                 .replace("%CHECK_NAME%", checkName)
                 .replace("%DETAILS%", details)

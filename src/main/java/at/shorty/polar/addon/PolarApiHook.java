@@ -41,10 +41,15 @@ public class PolarApiHook implements Runnable {
                     }
                     cooldownCache.put(key, System.currentTimeMillis() + (mitigation.getCooldownPerPlayerAndType() * 1000L));
                 }
+                double vl = mitigationEvent.check().violationLevel();
+                double punishVl = mitigationEvent.check().punishVl();
+                int iVl = (int) vl;
+                int iPunishVl = (int) punishVl;
                 String content = Webhooks.replacePlaceholders(
                         mitigation.renderJson(),
                         mitigationEvent.user().username(),
-                        String.valueOf(mitigationEvent.check().violationLevel()),
+                        mitigation.isRoundVl() ? String.valueOf(iVl) : String.valueOf(vl),
+                        mitigation.isRoundVl() ? String.valueOf(iPunishVl) : String.valueOf(punishVl),
                         mitigationEvent.check().type().name(),
                         mitigationEvent.check().name(),
                         mitigationEvent.details(),
@@ -63,10 +68,15 @@ public class PolarApiHook implements Runnable {
                     }
                     cooldownCache.put(key, System.currentTimeMillis() + (detection.getCooldownPerPlayerAndType() * 1000L));
                 }
+                double vl = detectionAlertEvent.check().violationLevel();
+                double punishVl = detectionAlertEvent.check().punishVl();
+                int iVl = (int) vl;
+                int iPunishVl = (int) punishVl;
                 String content = Webhooks.replacePlaceholders(
                         detection.renderJson(),
                         detectionAlertEvent.user().username(),
-                        String.valueOf(detectionAlertEvent.check().violationLevel()),
+                        detection.isRoundVl() ? String.valueOf(iVl) : String.valueOf(vl),
+                        detection.isRoundVl() ? String.valueOf(iPunishVl) : String.valueOf(punishVl),
                         detectionAlertEvent.check().type().name(),
                         detectionAlertEvent.check().name(),
                         detectionAlertEvent.details(),
@@ -89,6 +99,7 @@ public class PolarApiHook implements Runnable {
                         cloudDetection.renderJson(),
                         cloudDetectionEvent.user().username(),
                         "",
+                        "",
                         cloudDetectionEvent.cloudCheckType().name(),
                         "",
                         cloudDetectionEvent.details(),
@@ -103,6 +114,7 @@ public class PolarApiHook implements Runnable {
                 String content = Webhooks.replacePlaceholders(
                         punishment.renderJson(),
                         punishmentEvent.user().username(),
+                        "",
                         "",
                         "",
                         "",

@@ -1,12 +1,12 @@
-webhook_url: "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
 # Placeholders
-# Mitigation: %PLAYER_NAME%, %VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
-# Detection: %PLAYER_NAME%, %VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
+# Mitigation: %PLAYER_NAME%, %VL%, %PUNISH_VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
+# Detection: %PLAYER_NAME%, %VL%, %PUNISH_VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
 # Cloud Detection: %PLAYER_NAME%, %CHECK_TYPE%, %DETAILS%
 # Punishment: %PLAYER_NAME%, %PUNISHMENT%, %REASON%
 mitigation:
   webhook_url: "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
   enabled: true
+  round_vl: true # Rounds the VL to the nearest integer
   cooldown_per_player_and_type: 5 # Seconds
   notifications:
     - 'MOVEMENT'
@@ -49,6 +49,7 @@ mitigation:
 detection:
   webhook_url: "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
   enabled: true
+  round_vl: true # Rounds the VL to the nearest integer
   cooldown_per_player_and_type: 0 # Seconds
   notifications:
     - 'MOVEMENT'

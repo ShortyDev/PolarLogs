@@ -12,6 +12,7 @@ public class Mitigation {
 
     private String webhookUrl;
     private boolean enabled;
+    private boolean roundVl;
     private int cooldownPerPlayerAndType;
     private String[] notifications;
     private String[] detailFilters;
@@ -30,6 +31,7 @@ public class Mitigation {
         Mitigation mitigation = new Mitigation();
         mitigation.setWebhookUrl(section.getString("webhook_url"));
         mitigation.setEnabled(section.getBoolean("enabled"));
+        mitigation.setRoundVl(section.getBoolean("round_vl"));
         mitigation.setCooldownPerPlayerAndType(section.getInt("cooldown_per_player_and_type"));
         mitigation.setNotifications(section.getStringList("notifications").toArray(new String[0]));
         mitigation.setDetailFilters(section.getStringList("filter_detail_lines").toArray(new String[0]));

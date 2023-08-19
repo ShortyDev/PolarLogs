@@ -12,6 +12,7 @@ public class Detection {
 
     private String webhookUrl;
     private boolean enabled;
+    private boolean roundVl;
     private int cooldownPerPlayerAndType;
     private String[] notifications;
     private String[] detailFilters;
@@ -30,6 +31,7 @@ public class Detection {
         Detection detection = new Detection();
         detection.setWebhookUrl(section.getString("webhook_url"));
         detection.setEnabled(section.getBoolean("enabled"));
+        detection.setRoundVl(section.getBoolean("round_vl"));
         detection.setCooldownPerPlayerAndType(section.getInt("cooldown_per_player_and_type"));
         detection.setNotifications(section.getStringList("notifications").toArray(new String[0]));
         detection.setDetailFilters(section.getStringList("filter_detail_lines").toArray(new String[0]));
