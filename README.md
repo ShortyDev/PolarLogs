@@ -1,8 +1,25 @@
 # Polar webhooks
 
-This is a simple webhook plugin for Polar Anticheat. You can configure everything.
+This is a simple webhook plugin for [Polar Anticheat](https://polar.top). It allows you to send notifications to a Discord channel when a player is mitigated, detected or punished.
+
+If you have any suggestions, feel free to open an issue or a pull request.
+
+### Mitigation message example (default config)
+This is an example of the default config for the mitigation message. The details field has been filtered using the `filter_detail_lines` field.
+
+![Example](assets/default_mitigation.png)
 
 ## Config
+
+### Cooldown per player and type
+The cooldown per player and type field allows you to set a cooldown for each player and check type. This is useful for preventing a player from spamming the webhook. For example, if you set the cooldown to 5 seconds, the plugin will not send any notifications of that type for that player until 5 seconds have passed. If you set the cooldown to 0, the plugin will not send any notifications of that type for that player until the cooldown expired.
+
+### Notifications field
+The notification list should contain all types of checks that you want to receive alerts for. By default, all checks are enabled. If you want to disable a check, simply remove it from the list.
+
+### Filter detail lines field
+The detail line filter allows you to filter out certain detail lines from being sent to Discord. This is useful for removing debug lines or lines that are not useful to you. If an asterisk is added to the end of a line, it will filter out all lines that start with that string. For example, adding `Debug*` to the filter list will filter out all lines that start with `Debug`. The same goes for adding `Click to teleport` to the filter list, it will filter out all lines that contain `Click to teleport`. You can also place an asterisk at the start and end of a line in order to check if a line contains a certain string. For example, adding `*name*` to the filter list will filter out all lines that contain `name`.
+
 ```yml
 # Placeholders
 # Mitigation: %PLAYER_NAME%, %VL%, %PUNISH_VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
