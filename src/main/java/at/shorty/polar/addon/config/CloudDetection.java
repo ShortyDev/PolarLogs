@@ -1,29 +1,33 @@
 package at.shorty.polar.addon.config;
 
-import com.google.gson.Gson;
+import at.shorty.polar.addon.hook.DiscordWebhook;
+import at.shorty.polar.addon.hook.Embed;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.bukkit.configuration.ConfigurationSection;
 import top.polar.api.user.event.type.CloudCheckType;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class CloudDetection {
+public class CloudDetection extends DiscordWebhook {
 
-    private String webhookUrl;
-    private boolean enabled;
-    private int cooldownPerPlayerAndType;
-    private String[] notifications;
-    private String[] detailFilters;
-    private String content;
-    private Embed[] embeds;
-
-    public String renderJson() {
-        return new Gson().toJson(this);
-    }
+    private transient String webhookUrl;
+    private transient boolean enabled;
+    private transient int cooldownPerPlayerAndType;
+    private transient String[] notifications;
+    private transient String[] detailFilters;
+    private transient Map<String, Long> cooldownCache;
 
     public boolean isNotificationEnabled(CloudCheckType checkType) {
         return Arrays.stream(notifications).anyMatch(s -> s.equalsIgnoreCase(checkType.name()));
+    }
+
+    public void initCache(Map<String, Long> cooldownCache) {
+        this.cooldownCache = cooldownCache;
     }
 
     public static CloudDetection loadFromConfigSection(ConfigurationSection section) {
@@ -35,6 +39,7 @@ public class CloudDetection {
         cloudDetection.setDetailFilters(section.getStringList("filter_detail_lines").toArray(new String[0]));
         cloudDetection.setContent(section.getString("content"));
         cloudDetection.setEmbeds(new Embed[]{Embed.loadFromConfigSection(section.getConfigurationSection("embed"))});
+        cloudDetection.initializeCache(cloudDetection.getCooldownPerPlayerAndType(), TimeUnit.SECONDS);
         return cloudDetection;
     }
 

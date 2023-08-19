@@ -1,27 +1,25 @@
 package at.shorty.polar.addon.config;
 
-import com.google.gson.Gson;
+import at.shorty.polar.addon.hook.DiscordWebhook;
+import at.shorty.polar.addon.hook.Embed;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.bukkit.configuration.ConfigurationSection;
 import top.polar.api.user.event.type.CheckType;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class Mitigation {
+public class Mitigation extends DiscordWebhook {
 
-    private String webhookUrl;
-    private boolean enabled;
-    private boolean roundVl;
-    private int cooldownPerPlayerAndType;
-    private String[] notifications;
-    private String[] detailFilters;
-    private String content;
-    private Embed[] embeds;
-
-    public String renderJson() {
-        return new Gson().toJson(this);
-    }
+    private transient String webhookUrl;
+    private transient boolean enabled;
+    private transient boolean roundVl;
+    private transient int cooldownPerPlayerAndType;
+    private transient String[] notifications;
+    private transient String[] detailFilters;
 
     public boolean isNotificationEnabled(CheckType checkType) {
         return Arrays.stream(notifications).anyMatch(s -> s.equalsIgnoreCase(checkType.name()));
@@ -37,6 +35,7 @@ public class Mitigation {
         mitigation.setDetailFilters(section.getStringList("filter_detail_lines").toArray(new String[0]));
         mitigation.setContent(section.getString("content"));
         mitigation.setEmbeds(new Embed[]{Embed.loadFromConfigSection(section.getConfigurationSection("embed"))});
+        mitigation.initializeCache(mitigation.getCooldownPerPlayerAndType(), TimeUnit.SECONDS);
         return mitigation;
     }
 

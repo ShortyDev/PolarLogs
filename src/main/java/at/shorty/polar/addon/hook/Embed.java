@@ -1,4 +1,4 @@
-package at.shorty.polar.addon.config;
+package at.shorty.polar.addon.hook;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

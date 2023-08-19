@@ -1,22 +1,19 @@
 package at.shorty.polar.addon.config;
 
-import com.google.gson.Gson;
+import at.shorty.polar.addon.hook.DiscordWebhook;
+import at.shorty.polar.addon.hook.Embed;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.bukkit.configuration.ConfigurationSection;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class Punishment {
+public class Punishment extends DiscordWebhook {
 
-    private String webhookUrl;
-    private boolean enabled;
-    private String[] typesEnabled;
-    private int cooldownPerPlayer;
-    private String content;
-    private Embed[] embeds;
-
-    public String renderJson() {
-        return new Gson().toJson(this);
-    }
+    private transient String webhookUrl;
+    private transient boolean enabled;
+    private transient String[] typesEnabled;
+    private transient int cooldownPerPlayer;
 
     public static Punishment loadFromConfigSection(ConfigurationSection section) {
         Punishment punishment = new Punishment();
