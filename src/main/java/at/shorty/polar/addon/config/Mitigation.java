@@ -20,6 +20,7 @@ public class Mitigation extends DiscordWebhook {
     private transient int cooldownPerPlayerAndType;
     private transient String[] notifications;
     private transient String[] detailFilters;
+    private transient double minVl;
 
     public boolean isNotificationEnabled(CheckType checkType) {
         return Arrays.stream(notifications).anyMatch(s -> s.equalsIgnoreCase(checkType.name()));
@@ -33,6 +34,7 @@ public class Mitigation extends DiscordWebhook {
         mitigation.setCooldownPerPlayerAndType(section.getInt("cooldown_per_player_and_type"));
         mitigation.setNotifications(section.getStringList("notifications").toArray(new String[0]));
         mitigation.setDetailFilters(section.getStringList("filter_detail_lines").toArray(new String[0]));
+        mitigation.setMinVl(section.getDouble("min_vl"));
         mitigation.setContent(section.getString("content"));
         mitigation.setEmbeds(new Embed[]{Embed.loadFromConfigSection(section.getConfigurationSection("embed"))});
         mitigation.initializeCache(mitigation.getCooldownPerPlayerAndType(), TimeUnit.SECONDS);

@@ -70,6 +70,7 @@ mitigation:
   filter_detail_lines: # Allows you to filter out certain detail lines from being sent to Discord
     - 'Click to teleport'
     - 'Debug*' # Lines starting with "Debug" will be filtered out
+  min_vl: 5 # Minimum VL to send a notification for
   content: 'Player %PLAYER_NAME% was mitigated for %VL% violations of %CHECK_TYPE% - %CHECK_NAME%'
   embed:
     title: 'Polar - Mitigation'
