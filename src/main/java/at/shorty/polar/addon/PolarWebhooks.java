@@ -10,7 +10,7 @@ import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import top.polar.api.loader.LoaderApi;
 
-@Plugin(name = "PolarWebhooks", version = "1.0.1")
+@Plugin(name = "PolarWebhooks", version = "1.0.2")
 @Dependency("PolarLoader")
 public class PolarWebhooks extends JavaPlugin {
 

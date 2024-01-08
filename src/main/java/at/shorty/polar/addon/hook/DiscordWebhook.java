@@ -20,6 +20,7 @@ public class DiscordWebhook extends DefaultCooldown {
             URL url = new URL(webhookUrl);
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0");
             connection.setRequestProperty("Content-Type", "application/json; utf-8");
             connection.setDoOutput(true);
             connection.getOutputStream().write(content.getBytes());
