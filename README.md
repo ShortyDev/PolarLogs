@@ -46,6 +46,7 @@ The notification list should contain all types of checks that you want to receiv
 The detail line filter allows you to filter out certain detail lines from being sent to Discord. This is useful for removing debug lines or lines that are not useful to you. If an asterisk is added to the end of a line, it will filter out all lines that start with that string. For example, adding `Debug*` to the filter list will filter out all lines that start with `Debug`. The same goes for adding `Click to teleport` to the filter list, it will filter out all lines that contain `Click to teleport`. You can also place an asterisk at the start and end of a line in order to check if a line contains a certain string. For example, adding `*name*` to the filter list will filter out all lines that contain `name`.
 
 ```yml
+command: 'polarwebhooks' # Use 'disable' to disable the command
 # Placeholders
 # Global: %PLAYER_NAME%, %PLAYER_UUID%, %PLAYER_PROTOCOL_VERSION%, %PLAYER_LATENCY%, %PLAYER_IP%, %PLAYER_CLIENT_VERSION_NAME%, %PLAYER_CLIENT_BRAND%, %TIMESTAMP% (current time in RFC-3339 format), %TIMESTAMP_UNIX% (current time in Unix format)
 # Mitigation: %VL%, %PUNISH_VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%

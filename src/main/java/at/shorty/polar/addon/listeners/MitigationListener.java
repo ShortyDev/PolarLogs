@@ -11,11 +11,15 @@ import java.util.function.Consumer;
 
 public class MitigationListener extends DefaultCooldown implements Consumer<MitigationEvent> {
 
-    private final Mitigation mitigation;
+    private Mitigation mitigation;
 
     public MitigationListener(Mitigation mitigation) {
         this.mitigation = mitigation;
         initializeCache(mitigation.getCooldownPerPlayerAndType(), TimeUnit.SECONDS);
+    }
+
+    public void reloadConfig(Mitigation mitigation) {
+        this.mitigation = mitigation;
     }
 
     @Override

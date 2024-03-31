@@ -11,11 +11,15 @@ import java.util.function.Consumer;
 
 public class CloudDetectionListener extends DefaultCooldown implements Consumer<CloudDetectionEvent> {
 
-    private final CloudDetection cloudDetection;
+    private CloudDetection cloudDetection;
 
     public CloudDetectionListener(CloudDetection cloudDetection) {
         this.cloudDetection = cloudDetection;
         initializeCache(cloudDetection.getCooldownPerPlayerAndType(), TimeUnit.SECONDS);
+    }
+
+    public void reloadConfig(CloudDetection cloudDetection) {
+        this.cloudDetection = cloudDetection;
     }
 
     @Override

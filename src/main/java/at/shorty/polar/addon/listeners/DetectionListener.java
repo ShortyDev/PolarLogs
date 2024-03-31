@@ -11,11 +11,15 @@ import java.util.function.Consumer;
 
 public class DetectionListener extends DefaultCooldown implements Consumer<DetectionAlertEvent> {
 
-    private final Detection detection;
+    private Detection detection;
 
     public DetectionListener(Detection detection) {
         this.detection = detection;
         initializeCache(detection.getCooldownPerPlayerAndType(), TimeUnit.SECONDS);
+    }
+
+    public void reloadConfig(Detection detection) {
+        this.detection = detection;
     }
 
     @Override

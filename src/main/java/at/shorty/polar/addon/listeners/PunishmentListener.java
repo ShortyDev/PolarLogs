@@ -13,6 +13,10 @@ public class PunishmentListener implements Consumer<PunishmentEvent> {
 
     private Punishment punishment;
 
+    public void reloadConfig(Punishment punishment) {
+        this.punishment = punishment;
+    }
+
     @Override
     public void accept(PunishmentEvent punishmentEvent) {
         if (!punishment.isEnabled()) return;
