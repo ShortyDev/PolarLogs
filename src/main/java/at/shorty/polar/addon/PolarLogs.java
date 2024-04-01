@@ -59,7 +59,7 @@ public class PolarLogs extends JavaPlugin {
                 logs.setContext("global");
             }
             try {
-                String url = "jdbc:mysql://" + logs.getDatabase().getSqlHost() + ":" + logs.getDatabase().getSqlPort() + "/" + logs.getDatabase().getSqlDatabase();
+                String url = "jdbc:mysql://" + logs.getDatabase().getSqlHost() + ":" + logs.getDatabase().getSqlPort() + "/" + logs.getDatabase().getSqlDatabase() + "?autoReconnect=true&useSSL=" + logs.getDatabase().isUseSsl();
                 connection = DriverManager.getConnection(url, logs.getDatabase().getSqlUsername(), logs.getDatabase().getSqlPassword());
             } catch (SQLException e) {
                 throw new RuntimeException(e);

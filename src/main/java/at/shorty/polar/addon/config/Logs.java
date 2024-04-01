@@ -276,6 +276,7 @@ public class Logs {
     public static class Database {
 
         public transient String sqlHost, sqlPort, sqlDatabase, sqlUsername, sqlPassword;
+        public transient boolean useSsl;
 
         public static Database loadFromConfigSection(ConfigurationSection section) {
             Database database = new Database();
@@ -284,6 +285,7 @@ public class Logs {
             database.setSqlDatabase(section.getString("sql_database"));
             database.setSqlUsername(section.getString("sql_username"));
             database.setSqlPassword(section.getString("sql_password"));
+            database.setUseSsl(section.getBoolean("use_ssl"));
             return database;
         }
 

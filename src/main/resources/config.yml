@@ -17,6 +17,7 @@ logs:
     sql_database: 'polar'
     sql_username: 'root'
     sql_password: ''
+    use_ssl: false
   # context - viewing logs in-game will be limited to this context (unless specified in the command)
   # Can't be empty or contain spaces (Allowed characters: a-z, A-Z, 0-9, _)
   # Examples: global, minigame, survival, etc.
