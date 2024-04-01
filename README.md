@@ -8,6 +8,19 @@ If you have any suggestions, feel free to open an issue or a pull request.
 
 [Github Releases](https://github.com/ShortyDev/PolarLogs/releases)
 
+## Command permissions
+/polarlogs - polarlogs.command
+/polarlogs reload - polarlogs.command.reload
+/polarlogs info - polarlogs.command.info
+/polarlogs trange - polarlogs.command.logs
+/polarlogs webhooks test - polarlogs.command.webhooks
+/polarlogs info <context> - polarlogs.command.info.context
+/polarlogs logs - polarlogs.command.logs
+/polarlogs logs info <player> - polarlogs.command.logs.info.player
+/polarlogs logs info <player> <context> - polarlogs.command.logs.info.player.context
+/polarlogs logs view <player> - polarlogs.command.logs.view.player
+/polarlogs logs view <player> <context> - polarlogs.command.logs.view.player.context
+
 # Logs
 
 Mitigation logs are disabled by default. You can enable them by setting `store.mitigation` to `true` in the config.

@@ -52,7 +52,7 @@ public class PolarLogsCommand extends Command {
                 commandSender.sendMessage("§aConfig reloaded!");
                 return true;
             } else if (args[0].equalsIgnoreCase("info")) {
-                if (!commandSender.hasPermission("polarlogs.command.logs.info")) {
+                if (!commandSender.hasPermission("polarlogs.command.info")) {
                     commandSender.sendMessage("§cYou do not have permission to execute this command!");
                     return true;
                 }
@@ -98,7 +98,7 @@ public class PolarLogsCommand extends Command {
                     return true;
                 }
             } else if (args[0].equalsIgnoreCase("info")) {
-                if (!commandSender.hasPermission("polarlogs.command.logs.info.context")) {
+                if (!commandSender.hasPermission("polarlogs.command.info.context")) {
                     commandSender.sendMessage("§cYou do not have permission to execute this command!");
                     return true;
                 }
