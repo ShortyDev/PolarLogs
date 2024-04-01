@@ -33,7 +33,7 @@ logs:
   # Fine tune mitigation logs if enabled
   mitigation:
     message: '&7%PLAYER_NAME% %PLAYER_CLIENT_VERSION_NAME% (%PLAYER_CLIENT_BRAND%) (%PLAYER_LATENCY%ms) &8- &c%VL% VL &b%CHECK_TYPE%'
-    hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%\n\n%DETAILS%'
+    hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%\n\n&r%DETAILS%'
     log_types:
       - 'MOVEMENT'
       - 'VELOCITY'
@@ -47,10 +47,10 @@ logs:
     min_vl: 5 # Minimum VL to store a mitigation log
   detection:
     message: '&7%PLAYER_NAME% %PLAYER_CLIENT_VERSION_NAME% (%PLAYER_CLIENT_BRAND%) (%PLAYER_LATENCY%ms) &8- &c%VL% VL &b%CHECK_TYPE%'
-    hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%\n\n%DETAILS%'
+    hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%\n\n&r%DETAILS%'
   cloud_detection:
     message: '&7%PLAYER_NAME% %PLAYER_CLIENT_VERSION_NAME% (%PLAYER_CLIENT_BRAND%) (%PLAYER_LATENCY%ms) &8- &b%CHECK_TYPE%'
-    hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%\n\n%DETAILS%'
+    hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%\n\n&r%DETAILS%'
   punishment:
     message: '&7%PLAYER_NAME% &8- &c%PUNISHMENT% &7for &b%REASON%'
     hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%'
