@@ -1,17 +1,23 @@
-# Polar Webhooks
+# Polar Logs
 
-This is a simple webhook plugin for [Polar Anticheat](https://polar.top). It allows you to send notifications to a Discord channel when a player is mitigated, detected or punished.
+This is an advanced logs plugin for [Polar Anticheat](https://polar.top). It allows context-based log storage in an MySQL database. It also allows you to send notifications to a Discord channel when a player is mitigated, detected or punished.
 
 If you have any suggestions, feel free to open an issue or a pull request.
+
+## Download
+
+[Github Releases](https://github.com/ShortyDev/PolarLogs/releases)
+
+# Logs
+
+Mitigation logs are disabled by default. You can enable them by setting `store.mitigation` to `true` in the config.
+
+# Webhooks
 
 ### Mitigation message example (default config)
 This is an example of the default config for the mitigation message. The details field has been filtered using the `filter_detail_lines` field.
 
 ![Example](assets/default_mitigation.png)
-
-## Download
-
-[Github Releases](https://github.com/ShortyDev/PolarWebhooks/releases)
 
 ## How to create a webhook
 
@@ -46,7 +52,64 @@ The notification list should contain all types of checks that you want to receiv
 The detail line filter allows you to filter out certain detail lines from being sent to Discord. This is useful for removing debug lines or lines that are not useful to you. If an asterisk is added to the end of a line, it will filter out all lines that start with that string. For example, adding `Debug*` to the filter list will filter out all lines that start with `Debug`. The same goes for adding `Click to teleport` to the filter list, it will filter out all lines that contain `Click to teleport`. You can also place an asterisk at the start and end of a line in order to check if a line contains a certain string. For example, adding `*name*` to the filter list will filter out all lines that contain `name`.
 
 ```yml
-command: 'polarwebhooks' # Use 'disable' to disable the command
+command: 'polarlogs' # Use 'disable' to disable the command
+# -------------------
+# Log storage
+# -------------------
+# Placeholders
+# Global: %PLAYER_NAME%, %PLAYER_UUID%, %PLAYER_LATENCY%, %PLAYER_CLIENT_VERSION_NAME%, %PLAYER_CLIENT_BRAND%, %TIMESTAMP%
+# Mitigation: %VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
+# Detection: %VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
+# Cloud Detection: %CHECK_TYPE%, %DETAILS%
+# Punishment: %PUNISHMENT%, %REASON%
+logs:
+  enabled: true
+  expire_after_days: 7 # Logs older than this will be deleted
+  database:
+    sql_host: 'localhost'
+    sql_port: 3306
+    sql_database: 'polar'
+    sql_username: 'root'
+    sql_password: ''
+  # context - viewing logs in-game will be limited to this context (unless specified in the command)
+  # Can't be empty or contain spaces (Allowed characters: a-z, A-Z, 0-9, _)
+  # Examples: global, minigame, survival, etc.
+  context: 'global'
+  # What logs to store
+  store:
+    mitigation: false
+    detection: true
+    cloud_detection: true
+    punishment: true
+  timestamp_format: 'yyyy-MM-dd HH:mm:ss'
+  # For all logs, cooldown per player and type are used from the Discord Webhooks section
+  # Fine tune mitigation logs if enabled
+  mitigation:
+    message: '&7%PLAYER_NAME% %PLAYER_CLIENT_VERSION_NAME% (%PLAYER_CLIENT_BRAND%) (%PLAYER_LATENCY%ms) &8- &c%VL% VL &b%CHECK_TYPE%'
+    hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%\n\n%DETAILS%'
+    log_types:
+      - 'MOVEMENT'
+      - 'VELOCITY'
+      - 'GROUND_SPOOF'
+      - 'LATENCY_ABUSE'
+      - 'TICK_SPEED'
+      - 'REACH'
+      - 'BLOCK_INTERACT'
+      - 'PHASE'
+      - 'CLOUD'
+    min_vl: 5 # Minimum VL to store a mitigation log
+  detection:
+    message: '&7%PLAYER_NAME% %PLAYER_CLIENT_VERSION_NAME% (%PLAYER_CLIENT_BRAND%) (%PLAYER_LATENCY%ms) &8- &c%VL% VL &b%CHECK_TYPE%'
+    hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%\n\n%DETAILS%'
+  cloud_detection:
+    message: '&7%PLAYER_NAME% %PLAYER_CLIENT_VERSION_NAME% (%PLAYER_CLIENT_BRAND%) (%PLAYER_LATENCY%ms) &8- &b%CHECK_TYPE%'
+    hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%\n\n%DETAILS%'
+  punishment:
+    message: '&7%PLAYER_NAME% &8- &c%PUNISHMENT% &7for &b%REASON%'
+    hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%'
+# -------------------
+# Discord Webhooks
+# -------------------
 # Placeholders
 # Global: %PLAYER_NAME%, %PLAYER_UUID%, %PLAYER_PROTOCOL_VERSION%, %PLAYER_LATENCY%, %PLAYER_IP%, %PLAYER_CLIENT_VERSION_NAME%, %PLAYER_CLIENT_BRAND%, %TIMESTAMP% (current time in RFC-3339 format), %TIMESTAMP_UNIX% (current time in Unix format)
 # Mitigation: %VL%, %PUNISH_VL%, %CHECK_TYPE%, %CHECK_NAME%, %DETAILS%
@@ -102,7 +165,7 @@ detection:
   webhook_url: "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz"
   enabled: true
   round_vl: true # Rounds the VL to the nearest integer
-  cooldown_per_player_and_type: 0 # Seconds
+  cooldown_per_player_and_type: 1 # Seconds
   notifications:
     - 'MOVEMENT'
     - 'VELOCITY'

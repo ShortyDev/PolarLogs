@@ -28,7 +28,7 @@ public class DiscordWebhook extends DefaultCooldown {
             connection.getOutputStream().close();
             connection.getInputStream().close();
         } catch (IOException e) {
-            System.err.println("[PolarWebhooks] Failed to send webhook!");
+            System.err.println("[PolarLogs] Failed to send webhook!");
             e.printStackTrace();
         }
     }
