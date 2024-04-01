@@ -12,6 +12,13 @@ If you have any suggestions, feel free to open an issue or a pull request.
 
 Mitigation logs are disabled by default. You can enable them by setting `store.mitigation` to `true` in the config.
 
+## Commands
+![Help](assets/polarlogs_help.png)
+
+![Info](assets/polarlogs_info.png)
+
+![Player info](assets/polarlogs_logs_player.png)
+
 # Webhooks
 
 ### Mitigation message example (default config)
