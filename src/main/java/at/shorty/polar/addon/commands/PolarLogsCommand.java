@@ -341,11 +341,11 @@ public class PolarLogsCommand extends Command {
             sender.sendMessage("§7Player info §b" + name + "§7@§b" + context + "§7:");
             TextComponent mitigations = new TextComponent("§7- Mitigations: §bx" + logCountData.getMitigations().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isMitigation() ? "" : " §c§o(locally disabled)"));
             mitigations.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(logCountData.getMitigations().entrySet().stream().map(entry -> "§7" + entry.getKey() + ": §bx" + entry.getValue()).collect(Collectors.joining("\n")))));
-            TextComponent detections = new TextComponent("§7- Detections: §bx" + logCountData.getDetections().values().stream().mapToInt(Integer::intValue).sum());
+            TextComponent detections = new TextComponent("§7- Detections: §bx" + logCountData.getDetections().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isDetection() ? "" : " §c§o(locally disabled)"));
             detections.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(logCountData.getDetections().entrySet().stream().map(entry -> "§7" + entry.getKey() + ": §bx" + entry.getValue()).collect(Collectors.joining("\n")))));
-            TextComponent cloudDetections = new TextComponent("§7- Cloud Detections: §bx" + logCountData.getCloudDetections().values().stream().mapToInt(Integer::intValue).sum());
+            TextComponent cloudDetections = new TextComponent("§7- Cloud Detections: §bx" + logCountData.getCloudDetections().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isCloudDetection() ? "" : " §c§o(locally disabled)"));
             cloudDetections.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(logCountData.getCloudDetections().entrySet().stream().map(entry -> "§7" + entry.getKey() + ": §bx" + entry.getValue()).collect(Collectors.joining("\n")))));
-            TextComponent punishments = new TextComponent("§7- Punishments: §bx" + logCountData.getPunishments().values().stream().mapToInt(Integer::intValue).sum());
+            TextComponent punishments = new TextComponent("§7- Punishments: §bx" + logCountData.getPunishments().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isPunishment() ? "" : " §c§o(locally disabled)"));
             punishments.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(logCountData.getPunishments().entrySet().stream().map(entry -> "§7" + entry.getKey() + ": §bx" + entry.getValue()).collect(Collectors.joining("\n")))));
             if (sender instanceof Player) {
                 Player player = (Player) sender;
