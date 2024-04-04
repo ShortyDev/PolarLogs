@@ -272,6 +272,17 @@ public class Logs {
     }
 
     public CompletableFuture<Boolean> establishConnection() {
+        try {
+            loadDriver("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            PolarLogs.getPlugin(PolarLogs.class).getLogger().warning("Couldn't load com.mysql.cj.jdbc.Driver, falling back to com.mysql.jdbc.Driver");
+            try {
+                loadDriver("com.mysql.jdbc.Driver");
+            } catch (ClassNotFoundException ex) {
+                PolarLogs.getPlugin(PolarLogs.class).getLogger().severe("Failed to load MySQL driver.");
+                return CompletableFuture.completedFuture(false);
+            }
+        }
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             try {
@@ -313,6 +324,10 @@ public class Logs {
             }
         });
         return future;
+    }
+
+    public void loadDriver(String className) throws ClassNotFoundException {
+        Class.forName(className);
     }
 
     public void dropConnection() {
