@@ -1,5 +1,6 @@
 package at.shorty.polar.addon.hook;
 
+import at.shorty.polar.addon.PolarLogs;
 import at.shorty.polar.addon.ratelimit.DefaultCooldown;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,7 +29,7 @@ public class DiscordWebhook extends DefaultCooldown {
             connection.getOutputStream().close();
             connection.getInputStream().close();
         } catch (IOException e) {
-            System.err.println("[PolarLogs] Failed to send webhook!");
+            PolarLogs.getPlugin(PolarLogs.class).getLogger().warning("Failed to send webhook message: " + e.getMessage());
             e.printStackTrace();
         }
     }

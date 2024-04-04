@@ -30,14 +30,16 @@ public class DetectionListener extends DefaultCooldown implements Consumer<Detec
 
     @Override
     public void accept(DetectionAlertEvent detectionAlertEvent) {
-        if (!detection.isEnabled()) return;
-        if (!detection.isNotificationEnabled(detectionAlertEvent.check().type())) return;
         if (detection.getCooldownPerPlayerAndType() > 0 && detection.handleCooldown(detectionAlertEvent)) return;
-        String content = WebhookComposer.composeDetectionWebhookMessage(detection, detectionAlertEvent);
-        content = WebhookComposer.replaceGlobalPlaceholders(content, detectionAlertEvent.user());
-        DiscordWebhook.sendWebhook(detection.getWebhookUrl(), content);
-        if (!detectionAlertEvent.details().equals("This is a test alert")) {
-            Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () -> logs.logDetection(detectionAlertEvent.user(), detectionAlertEvent.check(), detectionAlertEvent.details()));
+        if (detection.isEnabled() && detection.isNotificationEnabled(detectionAlertEvent.check().type())) {
+            String content = WebhookComposer.composeDetectionWebhookMessage(detection, detectionAlertEvent);
+            content = WebhookComposer.replaceGlobalPlaceholders(content, detectionAlertEvent.user());
+            DiscordWebhook.sendWebhook(detection.getWebhookUrl(), content);
+        }
+        if (logs.isEnabled() && logs.getStore().isDetection()) {
+            if (!detectionAlertEvent.details().equals("This is a test alert")) {
+                Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () -> logs.logDetection(detectionAlertEvent.user(), detectionAlertEvent.check(), detectionAlertEvent.details()));
+            }
         }
     }
 }

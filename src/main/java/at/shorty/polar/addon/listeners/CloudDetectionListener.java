@@ -30,12 +30,16 @@ public class CloudDetectionListener extends DefaultCooldown implements Consumer<
 
     @Override
     public void accept(CloudDetectionEvent cloudDetectionEvent) {
-        if (!cloudDetection.isEnabled()) return;
-        if (!cloudDetection.isNotificationEnabled(cloudDetectionEvent.cloudCheckType())) return;
         if (cloudDetection.getCooldownPerPlayerAndType() > 0 && cloudDetection.handleCooldown(cloudDetectionEvent)) return;
-        String content = WebhookComposer.composeCloudDetectionWebhookMessage(cloudDetection, cloudDetectionEvent);
-        content = WebhookComposer.replaceGlobalPlaceholders(content, cloudDetectionEvent.user());
-        DiscordWebhook.sendWebhook(cloudDetection.getWebhookUrl(), content);
-        Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () -> logs.logCloudDetection(cloudDetectionEvent.user(), cloudDetectionEvent.cloudCheckType(), cloudDetectionEvent.details()));
+        if (cloudDetection.isEnabled() && cloudDetection.isNotificationEnabled(cloudDetectionEvent.cloudCheckType())) {
+            String content = WebhookComposer.composeCloudDetectionWebhookMessage(cloudDetection, cloudDetectionEvent);
+            content = WebhookComposer.replaceGlobalPlaceholders(content, cloudDetectionEvent.user());
+            DiscordWebhook.sendWebhook(cloudDetection.getWebhookUrl(), content);
+        }
+        if (logs.isEnabled() && logs.getStore().isCloudDetection()) {
+            if (!cloudDetectionEvent.details().equals("This is a test alert")) {
+                Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () -> logs.logCloudDetection(cloudDetectionEvent.user(), cloudDetectionEvent.cloudCheckType(), cloudDetectionEvent.details()));
+            }
+        }
     }
 }

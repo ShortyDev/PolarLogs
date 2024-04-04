@@ -11,20 +11,15 @@ import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import top.polar.api.loader.LoaderApi;
 
 import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Set;
 
-@Plugin(name = "PolarLogs", version = "2.0")
+@Plugin(name = "PolarLogs", version = "2.1")
 @Dependency("PolarLoader")
 public class PolarLogs extends JavaPlugin {
 
     private PolarApiHook polarApiHook;
     @Getter
     private Logs logs;
-    private Connection connection;
 
     @Override
     public void onLoad() {
@@ -47,7 +42,8 @@ public class PolarLogs extends JavaPlugin {
                 Field bukkitCommandMap = getServer().getClass().getDeclaredField("commandMap");
                 bukkitCommandMap.setAccessible(true);
                 CommandMap commandMap = (CommandMap) bukkitCommandMap.get(getServer());
-                commandMap.register(command, new PolarLogsCommand(this, command));
+                PolarLogsCommand polarLogsCommand = new PolarLogsCommand(this, command);
+                commandMap.register(command, polarLogsCommand);
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 getLogger().severe("Failed to register command: " + e.getMessage());
             }
@@ -55,56 +51,23 @@ public class PolarLogs extends JavaPlugin {
         if (logs.isEnabled()) {
             if (!logs.getContext().matches("^[a-zA-Z0-9_]+$") || logs.getContext().isEmpty()) {
                 getLogger().severe("Invalid log context name, must be [a-zA-Z0-9_]");
-                getLogger().severe("Using default context name: global");
+                getLogger().severe("Falling back to default context name: global");
                 logs.setContext("global");
             }
-            try {
-                String url = "jdbc:mysql://" + logs.getDatabase().getSqlHost() + ":" + logs.getDatabase().getSqlPort() + "/" + logs.getDatabase().getSqlDatabase() + "?autoReconnect=true&useSSL=" + logs.getDatabase().isUseSsl();
-                connection = DriverManager.getConnection(url, logs.getDatabase().getSqlUsername(), logs.getDatabase().getSqlPassword());
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            logs.setConnection(connection);
-            try {
-                PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS polar_logs_" + logs.getContext() + " (" +
-                        "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                        "type VARCHAR(255), " +
-                        "player_name VARCHAR(16), " +
-                        "player_uuid VARCHAR(36), " +
-                        "player_version VARCHAR(20), " +
-                        "player_latency INT, " +
-                        "player_brand VARCHAR(64), " +
-                        "vl DOUBLE, " +
-                        "check_type VARCHAR(64), " +
-                        "check_name VARCHAR(64), " +
-                        "details VARCHAR(1024), " +
-                        "punishment_type VARCHAR(16), " +
-                        "punishment_reason VARCHAR(64), " +
-                        "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
-                statement.execute();
-                statement.close();
-
-                PreparedStatement deleteExpiredLogs = connection.prepareStatement("DELETE FROM polar_logs_" + logs.getContext() + " WHERE timestamp < DATE_SUB(NOW(), INTERVAL " + logs.expireAfterDays + " DAY)");
-                int updated = deleteExpiredLogs.executeUpdate();
-                if (updated > 0) {
-                    getLogger().info("Deleted " + updated + " expired logs. (Logs older than " + logs.expireAfterDays + " day(s))");
+            logs.establishConnection().thenAccept(established -> {
+                if (established) {
+                    getLogger().info("Connected to database.");
+                } else {
+                    getLogger().severe("Failed to establish connection to database.");
                 }
-                deleteExpiredLogs.close();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            getLogger().info("Connected to database.");
+            });
         }
     }
 
     @Override
     public void onDisable() {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+        if (logs != null && logs.isEnabled()) {
+            logs.dropConnection();
         }
     }
 
@@ -114,8 +77,22 @@ public class PolarLogs extends JavaPlugin {
 
     public void reloadPluginConfig() {
         reloadConfig();
+        if (logs != null) {
+            logs.dropConnection();
+        }
         logs = Logs.loadFromConfigSection(getConfig().getConfigurationSection("logs"));
-        logs.setConnection(connection);
+        if (!logs.getContext().matches("^[a-zA-Z0-9_]+$") || logs.getContext().isEmpty()) {
+            getLogger().severe("Invalid log context name, must be [a-zA-Z0-9_]");
+            getLogger().severe("Falling back to default context name: global");
+            logs.setContext("global");
+        }
+        logs.establishConnection().thenAccept(established -> {
+            if (established) {
+                getLogger().info("Connected to database.");
+            } else {
+                getLogger().severe("Failed to establish connection to database.");
+            }
+        });
         polarApiHook.reloadConfig(
                 Mitigation.loadFromConfigSection(getConfig().getConfigurationSection("mitigation")),
                 Detection.loadFromConfigSection(getConfig().getConfigurationSection("detection")),

@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
 import top.polar.api.user.event.PunishmentEvent;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 @AllArgsConstructor
@@ -25,12 +24,13 @@ public class PunishmentListener implements Consumer<PunishmentEvent> {
 
     @Override
     public void accept(PunishmentEvent punishmentEvent) {
-        if (!punishment.isEnabled()) return;
-        if (!String.join("", punishment.getTypesEnabled()).contains(punishmentEvent.type().name())) return;
-        String content = WebhookComposer.composePunishmentWebhookMessage(punishment, punishmentEvent);
-        content = WebhookComposer.replaceGlobalPlaceholders(content, punishmentEvent.user());
-        DiscordWebhook.sendWebhook(punishment.getWebhookUrl(), content);
-        logs.logPunishment(punishmentEvent.user(), punishmentEvent.type(), punishmentEvent.reason());
-        Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () -> logs.logPunishment(punishmentEvent.user(), punishmentEvent.type(), punishmentEvent.reason()));
+        if (punishment.isEnabled() && String.join("", punishment.getTypesEnabled()).contains(punishmentEvent.type().name())) {
+            String content = WebhookComposer.composePunishmentWebhookMessage(punishment, punishmentEvent);
+            content = WebhookComposer.replaceGlobalPlaceholders(content, punishmentEvent.user());
+            DiscordWebhook.sendWebhook(punishment.getWebhookUrl(), content);
+        }
+        if (logs.isEnabled() && logs.getStore().isPunishment()) {
+            Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () -> logs.logPunishment(punishmentEvent.user(), punishmentEvent.type(), punishmentEvent.reason()));
+        }
     }
 }

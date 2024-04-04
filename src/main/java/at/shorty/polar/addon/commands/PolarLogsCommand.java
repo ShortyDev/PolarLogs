@@ -6,10 +6,10 @@ import at.shorty.polar.addon.data.LogCountData;
 import at.shorty.polar.addon.data.LogEntry;
 import at.shorty.polar.addon.util.TimeRange;
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,10 +17,7 @@ import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PolarLogsCommand extends Command {
@@ -56,6 +53,10 @@ public class PolarLogsCommand extends Command {
                     commandSender.sendMessage("§cYou do not have permission to execute this command!");
                     return true;
                 }
+                if (!polarLogs.getLogs().connectionEstablished()) {
+                    commandSender.sendMessage("§cDatabase connection not established!");
+                    return true;
+                }
                 try {
                     int count = polarLogs.getLogs().countLogs(polarLogs.getLogs().getContext());
                     commandSender.sendMessage("§bPolar Logs §8- §7Addon by §cShorty");
@@ -63,13 +64,15 @@ public class PolarLogsCommand extends Command {
                     commandSender.sendMessage("§7- Count: §b" + count + " logs");
                 } catch (SQLException e) {
                     commandSender.sendMessage("§cContext does (probably) not exist!");
-                    commandSender.sendMessage("§cFailed to count logs (error in console)");
-                    e.printStackTrace();
                 }
                 return true;
             } else if (args[0].equalsIgnoreCase("trange")) {
                 if (!commandSender.hasPermission("polarlogs.command.logs")) {
                     commandSender.sendMessage("§cYou do not have permission to execute this command!");
+                    return true;
+                }
+                if (!polarLogs.getLogs().connectionEstablished()) {
+                    commandSender.sendMessage("§cDatabase connection not established!");
                     return true;
                 }
                 commandSender.sendMessage("§bPolar Logs §8- §7Addon by §cShorty");
@@ -102,6 +105,10 @@ public class PolarLogsCommand extends Command {
                     commandSender.sendMessage("§cYou do not have permission to execute this command!");
                     return true;
                 }
+                if (!polarLogs.getLogs().connectionEstablished()) {
+                    commandSender.sendMessage("§cDatabase connection not established!");
+                    return true;
+                }
                 String context = args[1];
                 if (!context.matches("^[a-zA-Z0-9_]+$")) {
                     commandSender.sendMessage("§cInvalid context name, must be [a-zA-Z0-9_]");
@@ -114,14 +121,16 @@ public class PolarLogsCommand extends Command {
                     commandSender.sendMessage("§7- Count: §b" + count + " logs");
                 } catch (SQLException e) {
                     commandSender.sendMessage("§cContext does (probably) not exist!");
-                    commandSender.sendMessage("§cFailed to count logs (error in console)");
-                    e.printStackTrace();
                 }
                 return true;
             }
         } else if (args.length >= 3 && args[0].toLowerCase().matches("^logs|log$")) {
             if (!commandSender.hasPermission("polarlogs.command.logs")) {
                 commandSender.sendMessage("§cYou do not have permission to execute this command!");
+                return true;
+            }
+            if (!polarLogs.getLogs().connectionEstablished()) {
+                commandSender.sendMessage("§cDatabase connection not established!");
                 return true;
             }
             if (args[1].equalsIgnoreCase("info")) {
@@ -204,6 +213,10 @@ public class PolarLogsCommand extends Command {
             TimeRange timeRange = null;
             if (name.contains(":")) {
                 String[] split = name.split(":");
+                if (split.length != 2) {
+                    sender.sendMessage("§cInvalid time range! See \"trange\" subcommand for valid inputs.");
+                    return;
+                }
                 name = split[0];
                 String trange = split[1];
                 try {
@@ -321,6 +334,10 @@ public class PolarLogsCommand extends Command {
             TimeRange timeRange = null;
             if (name.contains(":")) {
                 String[] split = name.split(":");
+                if (split.length != 2) {
+                    sender.sendMessage("§cInvalid time range! See \"trange\" subcommand for valid inputs.");
+                    return;
+                }
                 name = split[0];
                 String trange = split[1];
                 try {
@@ -365,4 +382,40 @@ public class PolarLogsCommand extends Command {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
+        if (alias.equalsIgnoreCase(this.command)) {
+            if (args.length == 1) {
+                return Arrays.asList("reload", "info", "trange", "webhooks", "logs");
+            } else if (args.length == 2) {
+                if (args[0].equalsIgnoreCase("logs") || args[0].equalsIgnoreCase("log")) {
+                    return Arrays.asList("info", "view");
+                } else if (args[0].equalsIgnoreCase("webhooks")) {
+                    return Collections.singletonList("test");
+                }
+            } else if (args.length == 3) {
+                if (args[0].equalsIgnoreCase("logs") || args[0].equalsIgnoreCase("log")) {
+                    if (args[1].equalsIgnoreCase("info") || args[1].equalsIgnoreCase("view")) {
+                        if (args[2].endsWith(":")) {
+                            String currentYear = new SimpleDateFormat("yyyy").format(new Date());
+                            String currentMonth = new SimpleDateFormat("MM").format(new Date());
+                            String currentDay = new SimpleDateFormat("dd").format(new Date());
+                            return Arrays.asList(
+                                    args[2] + "today",
+                                    args[2] + "yesterday",
+                                    args[2] + "1h",
+                                    args[2] + "1d",
+                                    args[2] + "1w",
+                                    args[2] + "1m",
+                                    args[2] + currentYear + "-" + currentMonth + "-" + currentDay);
+                        }
+                        return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 }

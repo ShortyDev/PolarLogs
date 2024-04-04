@@ -1,5 +1,6 @@
 package at.shorty.polar.addon.config;
 
+import at.shorty.polar.addon.PolarLogs;
 import at.shorty.polar.addon.data.LogCountData;
 import at.shorty.polar.addon.data.LogEntry;
 import at.shorty.polar.addon.util.TimeRange;
@@ -12,14 +13,12 @@ import top.polar.api.user.event.type.CloudCheckType;
 import top.polar.api.user.event.type.PunishmentType;
 
 import javax.annotation.Nullable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Data
 public class Logs {
@@ -270,6 +269,66 @@ public class Logs {
         logs.setPunishmentMessage(section.getConfigurationSection("punishment").getString("message"));
         logs.setPunishmentHoverText(section.getConfigurationSection("punishment").getString("hover_text"));
         return logs;
+    }
+
+    public CompletableFuture<Boolean> establishConnection() {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            try {
+                String url = "jdbc:mysql://" + database.getSqlHost() + ":" + database.getSqlPort() + "/" + database.getSqlDatabase() + "?autoReconnect=true&useSSL=" + database.isUseSsl();
+                connection = DriverManager.getConnection(url, database.getSqlUsername(), database.getSqlPassword());
+                try {
+                    PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS polar_logs_" + context + " (" +
+                            "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                            "type VARCHAR(255), " +
+                            "player_name VARCHAR(16), " +
+                            "player_uuid VARCHAR(36), " +
+                            "player_version VARCHAR(20), " +
+                            "player_latency INT, " +
+                            "player_brand VARCHAR(64), " +
+                            "vl DOUBLE, " +
+                            "check_type VARCHAR(64), " +
+                            "check_name VARCHAR(64), " +
+                            "details VARCHAR(1024), " +
+                            "punishment_type VARCHAR(16), " +
+                            "punishment_reason VARCHAR(64), " +
+                            "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+                    statement.execute();
+                    statement.close();
+
+                    PreparedStatement deleteExpiredLogs = connection.prepareStatement("DELETE FROM polar_logs_" + context + " WHERE timestamp < DATE_SUB(NOW(), INTERVAL " + expireAfterDays + " DAY)");
+                    int updated = deleteExpiredLogs.executeUpdate();
+                    if (updated > 0) {
+                        PolarLogs.getPlugin(PolarLogs.class).getLogger().info("Deleted " + updated + " expired logs. (Logs older than " + expireAfterDays + " day(s))");
+                    }
+                    deleteExpiredLogs.close();
+                    future.complete(true);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    future.complete(false);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                future.complete(false);
+            }
+        });
+        return future;
+    }
+
+    public void dropConnection() {
+        if (connection != null) {
+            try {
+                connection.close();
+                PolarLogs.getPlugin(PolarLogs.class).getLogger().info("Closed database connection.");
+            } catch (SQLException e) {
+                e.printStackTrace();
+                PolarLogs.getPlugin(PolarLogs.class).getLogger().severe("Failed to close database connection.");
+            }
+        }
+    }
+
+    public boolean connectionEstablished() {
+        return connection != null;
     }
 
     @Data
