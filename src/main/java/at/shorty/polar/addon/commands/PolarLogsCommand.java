@@ -144,6 +144,10 @@ public class PolarLogsCommand extends Command {
                     return true;
                 }
                 String query = args[1];
+                if (query.length() < 2) {
+                    commandSender.sendMessage("§cInvalid query, must start with p: or c:");
+                    return true;
+                }
                 boolean isPlayerQuery = query.startsWith("p:");
                 boolean isContextQuery = query.startsWith("c:");
                 String name = args[1].substring(2);
