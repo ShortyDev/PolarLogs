@@ -34,19 +34,6 @@ public class Logs {
     @Setter
     private Connection connection;
 
-    public int countLogs(String context) throws SQLException {
-        if (!context.matches("^[a-zA-Z0-9_]+$")) {
-            throw new IllegalArgumentException("Invalid log context name, must be [a-zA-Z0-9_]");
-        }
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT COUNT(*) FROM polar_logs_" + context);
-        preparedStatement.executeQuery();
-        try (ResultSet resultSet = preparedStatement.getResultSet()) {
-            resultSet.next();
-            return resultSet.getInt(1);
-        } finally {
-            preparedStatement.close();
-        }
-    }
 
     public LogCountData getLogCountData(String context, String player, @Nullable TimeRange timeRange) throws SQLException {
         if (!context.matches("^[a-zA-Z0-9_]+$")) {
@@ -58,14 +45,24 @@ public class Logs {
         Map<String, Integer> punishment = new HashMap<>();
         PreparedStatement preparedStatement;
 
-        if (timeRange == null) {
-            preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? GROUP BY check_type, type;");
+        if (player != null) {
+            if (timeRange == null) {
+                preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? GROUP BY check_type, type;");
+            } else {
+                preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY check_type, type;");
+                preparedStatement.setLong(2, timeRange.start);
+                preparedStatement.setLong(3, timeRange.end);
+            }
+            preparedStatement.setString(1, player);
         } else {
-            preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY check_type, type;");
-            preparedStatement.setLong(2, timeRange.start);
-            preparedStatement.setLong(3, timeRange.end);
+            if (timeRange == null) {
+                preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " GROUP BY check_type, type;");
+            } else {
+                preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY check_type, type;");
+                preparedStatement.setLong(1, timeRange.start);
+                preparedStatement.setLong(2, timeRange.end);
+            }
         }
-        preparedStatement.setString(1, player);
         preparedStatement.executeQuery();
         try (ResultSet resultSet = preparedStatement.getResultSet()) {
             while (resultSet.next()) {
@@ -89,14 +86,24 @@ public class Logs {
             preparedStatement.close();
         }
         PreparedStatement punishmentStatement;
-        if (timeRange == null) {
-            punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? AND type = 'punishment' GROUP BY punishment_type;");
+        if (player != null) {
+            if (timeRange == null) {
+                punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? AND type = 'punishment' GROUP BY punishment_type;");
+            } else {
+                punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? AND type = 'punishment' AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY punishment_type;");
+                punishmentStatement.setLong(2, timeRange.start);
+                punishmentStatement.setLong(3, timeRange.end);
+            }
+            punishmentStatement.setString(1, player);
         } else {
-            punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? AND type = 'punishment' AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY punishment_type;");
-            punishmentStatement.setLong(2, timeRange.start);
-            punishmentStatement.setLong(3, timeRange.end);
+            if (timeRange == null) {
+                punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE type = 'punishment' GROUP BY punishment_type;");
+            } else {
+                punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE type = 'punishment' AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY punishment_type;");
+                punishmentStatement.setLong(1, timeRange.start);
+                punishmentStatement.setLong(2, timeRange.end);
+            }
         }
-        punishmentStatement.setString(1, player);
         punishmentStatement.executeQuery();
         try (ResultSet resultSet = punishmentStatement.getResultSet()) {
             while (resultSet.next()) {
@@ -115,16 +122,28 @@ public class Logs {
             throw new IllegalArgumentException("Invalid log context name, must be [a-zA-Z0-9_]");
         }
         PreparedStatement preparedStatement;
-        if (timeRange == null) {
-            preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " WHERE player_name = ? ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
+        if (player != null) {
+            if (timeRange == null) {
+                preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " WHERE player_name = ? ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
+            } else {
+                preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " WHERE player_name = ? AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
+                preparedStatement.setLong(2, timeRange.start);
+                preparedStatement.setLong(3, timeRange.end);
+            }
+            preparedStatement.setString(1, player);
+            preparedStatement.setInt(timeRange == null ? 2 : 4, limit);
+            preparedStatement.setInt(timeRange == null ? 3 : 5, offset);
         } else {
-            preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " WHERE player_name = ? AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
-            preparedStatement.setLong(2, timeRange.start);
-            preparedStatement.setLong(3, timeRange.end);
+            if (timeRange == null) {
+                preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
+            } else {
+                preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " WHERE ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
+                preparedStatement.setLong(1, timeRange.start);
+                preparedStatement.setLong(2, timeRange.end);
+            }
+            preparedStatement.setInt(timeRange == null ? 1 : 3, limit);
+            preparedStatement.setInt(timeRange == null ? 2 : 4, offset);
         }
-        preparedStatement.setString(1, player);
-        preparedStatement.setInt(timeRange == null ? 2 : 4, limit);
-        preparedStatement.setInt(timeRange == null ? 3 : 5, offset);
         preparedStatement.executeQuery();
         try {
             return getLogEntries(preparedStatement);
@@ -342,7 +361,7 @@ public class Logs {
         }
     }
 
-    public boolean connectionEstablished() {
+    public boolean isConnected() {
         return connection != null;
     }
 

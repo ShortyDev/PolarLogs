@@ -20,6 +20,7 @@ public class PolarLogs extends JavaPlugin {
     private PolarApiHook polarApiHook;
     @Getter
     private Logs logs;
+    public static String prefix = "§bLogs §7| §r";
 
     @Override
     public void onLoad() {

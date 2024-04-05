@@ -1,6 +1,8 @@
 # Polar Logs
 
-This is an advanced logs plugin for [Polar Anticheat](https://polar.top). It allows context-based log storage in an MySQL database. It also allows you to send notifications to a Discord channel when a player is mitigated, detected or punished.
+This is an advanced logs plugin for [Polar Anticheat](https://polar.top). It allows context-based log storage in an
+MySQL database. It also allows you to send notifications to a Discord channel when a player is mitigated, detected or
+punished.
 
 If you have any suggestions, feel free to open an issue or a pull request.
 
@@ -9,26 +11,33 @@ If you have any suggestions, feel free to open an issue or a pull request.
 [Github Releases](https://github.com/ShortyDev/PolarLogs/releases)
 
 ## Command permissions
-| Command                                 | Permission                                 |
-|-----------------------------------------|--------------------------------------------|
-| /polarlogs                              | polarlogs.command                          |
-| /polarlogs reload                       | polarlogs.command.reload                   |
-| /polarlogs trange                       | polarlogs.command.logs                     |
-| /polarlogs webhooks test                | polarlogs.command.webhooks                 |
-| /polarlogs info                         | polarlogs.command.info                     |
-| /polarlogs info (context)               | polarlogs.command.info.context             |
-| /polarlogs logs                         | polarlogs.command.logs                     |
-| /polarlogs logs info (player)           | polarlogs.command.logs.info.player         |
-| /polarlogs logs info (player) (context) | polarlogs.command.logs.info.player.context |
-| /polarlogs logs view (player)           | polarlogs.command.logs.view.player         |
-| /polarlogs logs view (player) (context) | polarlogs.command.logs.view.player.context |
+
+| Command                                       | Description                     | Permission                    |
+|-----------------------------------------------|---------------------------------|-------------------------------|
+| /polarlogs                                    | Show help                       | polarlogs.command             |
+| /polarlogs reload                             | Reload the config               | polarlogs.command.reload      |
+| /polarlogs trange                             | See help page for time ranges   | polarlogs.command.logs        |
+| /polarlogs webhooks test                      | Test webhook                    | polarlogs.command.webhooks    |
+| /polarlogs info (player)                      | Show information about a player | polarlogs.command.info.player |
+| /polarlogs view ([query](#View-query)) (page) | View logs (query desc. below)   | polarlogs.command.view        |
+
+### View query
+The query argument allows to filter for player and context.
+
+The general format for filtering by context only is `c:<context>`. For example, `c:global`.
+
+The general format for filtering by player is `p:<player>`. For example, `p:Shorty`. By appending `@<context>` to the player name, you can filter by player and context. For example, `p:Shorty@global`.
+
+In order to reduce the logs to a specific time range, you can append `:<time range>` to the player or context name. For example, `p:Shorty:today`, `c:global:1d` or `p:Shorty@global:1w`.
 
 ## Time range
+
 The logs info and logs view commands allow narrowing down the time range by appending :value to the player name.
 
 Example command: `/polarlogs logs view Shorty:today global`
 
 Available time selectors:
+
 - `today`
 - `yesterday`
 - `1h` last 60 minutes
@@ -44,6 +53,7 @@ Available time selectors:
 Mitigation logs are disabled by default. You can enable them by setting `store.mitigation` to `true` in the config.
 
 ## Commands
+
 ![Help](assets/polarlogs_help.png)
 
 ![Info](assets/polarlogs_info.png)
@@ -53,7 +63,9 @@ Mitigation logs are disabled by default. You can enable them by setting `store.m
 # Webhooks
 
 ### Mitigation message example (default config)
-This is an example of the default config for the mitigation message. The details field has been filtered using the `filter_detail_lines` field.
+
+This is an example of the default config for the mitigation message. The details field has been filtered using
+the `filter_detail_lines` field.
 
 ![Example](assets/default_mitigation.png)
 
@@ -81,13 +93,26 @@ address.
 ## Config
 
 ### Cooldown per player and type
-The cooldown per player and type field allows you to set a cooldown for each player and check type. This is useful for preventing a player from spamming the webhook. For example, if you set the cooldown to 5 seconds, the plugin will not send any notifications of that type for that player until 5 seconds have passed. A cooldown of 0 means that there is no cooldown.
+
+The cooldown per player and type field allows you to set a cooldown for each player and check type. This is useful for
+preventing a player from spamming the webhook. For example, if you set the cooldown to 5 seconds, the plugin will not
+send any notifications of that type for that player until 5 seconds have passed. A cooldown of 0 means that there is no
+cooldown.
 
 ### Notifications field
-The notification list should contain all types of checks that you want to receive alerts for. By default, all checks are enabled. If you want to disable a check, simply remove it from the list.
+
+The notification list should contain all types of checks that you want to receive alerts for. By default, all checks are
+enabled. If you want to disable a check, simply remove it from the list.
 
 ### Filter detail lines field
-The detail line filter allows you to filter out certain detail lines from being sent to Discord. This is useful for removing debug lines or lines that are not useful to you. If an asterisk is added to the end of a line, it will filter out all lines that start with that string. For example, adding `Debug*` to the filter list will filter out all lines that start with `Debug`. The same goes for adding `Click to teleport` to the filter list, it will filter out all lines that contain `Click to teleport`. You can also place an asterisk at the start and end of a line in order to check if a line contains a certain string. For example, adding `*name*` to the filter list will filter out all lines that contain `name`.
+
+The detail line filter allows you to filter out certain detail lines from being sent to Discord. This is useful for
+removing debug lines or lines that are not useful to you. If an asterisk is added to the end of a line, it will filter
+out all lines that start with that string. For example, adding `Debug*` to the filter list will filter out all lines
+that start with `Debug`. The same goes for adding `Click to teleport` to the filter list, it will filter out all lines
+that contain `Click to teleport`. You can also place an asterisk at the start and end of a line in order to check if a
+line contains a certain string. For example, adding `*name*` to the filter list will filter out all lines that
+contain `name`.
 
 ```yml
 command: 'polarlogs' # Use 'disable' to disable the command
