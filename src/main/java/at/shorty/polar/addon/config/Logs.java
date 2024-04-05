@@ -305,6 +305,7 @@ public class Logs {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             try {
+                DriverManager.setLoginTimeout(5);
                 String url = "jdbc:mysql://" + database.getSqlHost() + ":" + database.getSqlPort() + "/" + database.getSqlDatabase() + "?autoReconnect=true&useSSL=" + database.isUseSsl();
                 connection = DriverManager.getConnection(url, database.getSqlUsername(), database.getSqlPassword());
                 try {
