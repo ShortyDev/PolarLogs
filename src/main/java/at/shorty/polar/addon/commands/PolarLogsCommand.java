@@ -79,13 +79,13 @@ public class PolarLogsCommand extends Command {
                 commandSender.sendMessage("§7Time range valid inputs:");
                 commandSender.sendMessage("§7- §btoday §7- today");
                 commandSender.sendMessage("§7- §byesterday §7- yesterday");
-                commandSender.sendMessage("§7- §b1h §7- last hour");
+                commandSender.sendMessage("§7- §b1h §7- last 60 minutes");
                 commandSender.sendMessage("§7- §b1d §7- last 24 hours");
-                commandSender.sendMessage("§7- §b1w §7- last week");
-                commandSender.sendMessage("§7- §b1m §7- last month");
+                commandSender.sendMessage("§7- §b1w §7- last 7 days");
+                commandSender.sendMessage("§7- §b1m §7- last 30 days");
                 commandSender.sendMessage("§7- §byyyy-MM-dd §7- specific date");
                 commandSender.sendMessage("§7- §byyyy-mm-dd;yyyy-MM-dd §7- date range");
-                commandSender.sendMessage("§7- §byyyy-mm §7- month");
+                commandSender.sendMessage("§7- §byyyy-mm §7- specific month");
                 return true;
             }
         } else if (args.length == 2) {
