@@ -228,6 +228,10 @@ public class PolarLogsCommand extends Command {
             }
             int offset = (page - 1) * entriesPerPage;
             int totalCount = polarLogs.getLogs().getLogCountData(context, name, timeRange).getTotalCount();
+            if (totalCount == 0) {
+                sender.sendMessage("§cNo logs available.");
+                return;
+            }
             int maxPage = (int) Math.ceil((double) totalCount / entriesPerPage);
             if (page > maxPage) {
                 sender.sendMessage("§cInvalid page number! (max: " + maxPage + ")");
