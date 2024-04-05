@@ -9,28 +9,35 @@ If you have any suggestions, feel free to open an issue or a pull request.
 [Github Releases](https://github.com/ShortyDev/PolarLogs/releases)
 
 ## Command permissions
-/polarlogs - polarlogs.command
+| Command                                 | Permission                                 |
+|-----------------------------------------|--------------------------------------------|
+| /polarlogs                              | polarlogs.command                          |
+| /polarlogs reload                       | polarlogs.command.reload                   |
+| /polarlogs trange                       | polarlogs.command.logs                     |
+| /polarlogs webhooks test                | polarlogs.command.webhooks                 |
+| /polarlogs info                         | polarlogs.command.info                     |
+| /polarlogs info (context)               | polarlogs.command.info.context             |
+| /polarlogs logs                         | polarlogs.command.logs                     |
+| /polarlogs logs info (player)           | polarlogs.command.logs.info.player         |
+| /polarlogs logs info (player) (context) | polarlogs.command.logs.info.player.context |
+| /polarlogs logs view (player)           | polarlogs.command.logs.view.player         |
+| /polarlogs logs view (player) (context) | polarlogs.command.logs.view.player.context |
 
-/polarlogs reload - polarlogs.command.reload
+## Time range
+The logs info and logs view commands allow narrowing down the time range by appending :value to the player name.
 
-/polarlogs info - polarlogs.command.info
+Example command: `/polarlogs logs view Shorty:today global`
 
-/polarlogs trange - polarlogs.command.logs
-
-/polarlogs webhooks test - polarlogs.command.webhooks
-
-/polarlogs info (context) - polarlogs.command.info.context
-
-/polarlogs logs - polarlogs.command.logs
-
-/polarlogs logs info (player) - polarlogs.command.logs.info.player
-
-/polarlogs logs info (player) (context) - polarlogs.command.logs.info.player.context
-
-/polarlogs logs view (player) - polarlogs.command.logs.view.player
-
-/polarlogs logs view (player) (context) - polarlogs.command.logs.view.player.context
-
+Available time selectors:
+- `today`
+- `yesterday`
+- `1h` last 60 minutes
+- `1d` last 24 hours
+- `1w` last 7 days
+- `1m` last 30 days
+- `yyyy-MM-dd` specific date
+- `yyyy-MM-dd;yyyy-MM-dd` time range
+- `yyyy-MM` specific month
 
 # Logs
 
