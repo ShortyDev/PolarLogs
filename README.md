@@ -30,6 +30,11 @@ The general format for filtering by player is `p:<player>`. For example, `p:Shor
 
 In order to reduce the logs to a specific time range, you can append `:<time range>` to the player or context name. For example, `p:Shorty:today`, `c:global:1d` or `p:Shorty@global:1w`.
 
+Extended permissions:
+- `polarlogs.command.view.player` - Allows viewing logs of a specific player
+- `polarlogs.command.view.player.context` - Allows viewing logs of a specific player and context
+- `polarlogs.command.view.context` - Allows viewing logs of a specific context
+
 ## Time range
 
 The logs info and logs view commands allow narrowing down the time range by appending :value to the player name.
