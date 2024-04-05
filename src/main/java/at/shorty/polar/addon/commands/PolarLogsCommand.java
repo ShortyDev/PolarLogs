@@ -411,32 +411,38 @@ public class PolarLogsCommand extends Command {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
-        if (alias.equalsIgnoreCase(this.command)) {
-            if (args.length == 1) {
-                return Arrays.asList("reload", "info", "trange", "webhooks", "view");
-            } else if (args.length == 2) {
-                if (args[0].equalsIgnoreCase("webhooks")) {
-                    return Collections.singletonList("test");
-                } else if (args[0].equalsIgnoreCase("info")) {
-                    return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
-                } else if (args[0].equalsIgnoreCase("view")) {
-                    if (args[1].endsWith(":") && args[1].length() > 2) {
-                        return Arrays.asList(args[1] + "today", args[1] + "yesterday", args[1] + "1h", args[1] + "1d", args[1] + "1w", args[1] + "1m");
-                    }
-                    if (args[1].startsWith("p:")) {
-                        List<String> onlinePlayers = Bukkit.getOnlinePlayers().stream().map(Player::getName).map(name -> args[1] + name).collect(Collectors.toList());
-                        if (args[1].endsWith("@")) {
-                            return Collections.singletonList(args[1] + polarLogs.getLogs().getContext());
+        if (args.length == 1) {
+            return Arrays.asList("reload", "info", "trange", "webhooks", "view");
+        } else if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("webhooks")) {
+                return Collections.singletonList("test");
+            } else if (args[0].equalsIgnoreCase("info")) {
+                return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+            } else if (args[0].equalsIgnoreCase("view")) {
+                if (args[1].endsWith(":") && args[1].length() > 2) {
+                    if (args[1].substring(2, args[1].length() - 1).contains(":"))
+                        return Collections.singletonList(args[1]);
+                    return Arrays.asList(args[1] + "today", args[1] + "yesterday", args[1] + "1h", args[1] + "1d", args[1] + "1w", args[1] + "1m");
+                }
+                if (args[1].startsWith("p:")) {
+                    if (args[1].endsWith("@")) {
+                        if (args[1].substring(2, args[1].length() - 1).contains("@")) {
+                            return Collections.singletonList(args[1]);
                         }
-                        return args[1].length() == 2 ? onlinePlayers : Collections.emptyList();
-                    } else if (args[1].startsWith("c:") && args[1].length() == 2) {
                         return Collections.singletonList(args[1] + polarLogs.getLogs().getContext());
+                    } else if (args[1].contains("@")) {
+                        return Collections.singletonList(args[1]);
                     }
-                    if (args[1].isEmpty()) {
-                        return Arrays.asList("p", "c");
-                    } else {
-                        return Collections.emptyList();
-                    }
+                    return Bukkit.getOnlinePlayers().stream().map(Player::getName).map(name -> "p:" + name).collect(Collectors.toList());
+                } else if (args[1].startsWith("c:")) {
+                    if (args[1].length() > 2 && args[1].substring(2, args[1].length() - 1).contains(":"))
+                        return Collections.singletonList(args[1]);
+                    return Collections.singletonList("c:" + polarLogs.getLogs().getContext());
+                }
+                if (args[1].isEmpty()) {
+                    return Arrays.asList("p", "c");
+                } else {
+                    return Collections.emptyList();
                 }
             }
         }
