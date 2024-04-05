@@ -48,6 +48,10 @@ public class PolarLogs extends JavaPlugin {
                 getLogger().severe("Failed to register command: " + e.getMessage());
             }
         }
+        loadLogs();
+    }
+
+    private void loadLogs() {
         if (logs.isEnabled()) {
             if (!logs.getContext().matches("^[a-zA-Z0-9_]+$") || logs.getContext().isEmpty()) {
                 getLogger().severe("Invalid log context name, must be [a-zA-Z0-9_]");
@@ -81,20 +85,7 @@ public class PolarLogs extends JavaPlugin {
             logs.dropConnection();
         }
         logs = Logs.loadFromConfigSection(getConfig().getConfigurationSection("logs"));
-        if (logs.isEnabled()) {
-            if (!logs.getContext().matches("^[a-zA-Z0-9_]+$") || logs.getContext().isEmpty()) {
-                getLogger().severe("Invalid log context name, must be [a-zA-Z0-9_]");
-                getLogger().severe("Falling back to default context name: global");
-                logs.setContext("global");
-            }
-            logs.establishConnection().thenAccept(established -> {
-                if (established) {
-                    getLogger().info("Connected to database.");
-                } else {
-                    getLogger().severe("Failed to establish connection to database.");
-                }
-            });
-        }
+        loadLogs();
         polarApiHook.reloadConfig(
                 Mitigation.loadFromConfigSection(getConfig().getConfigurationSection("mitigation")),
                 Detection.loadFromConfigSection(getConfig().getConfigurationSection("detection")),
