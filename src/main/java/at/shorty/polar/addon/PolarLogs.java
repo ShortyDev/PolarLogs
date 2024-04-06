@@ -13,7 +13,7 @@ import top.polar.api.loader.LoaderApi;
 import java.lang.reflect.Field;
 import java.util.Set;
 
-@Plugin(name = "PolarLogs", version = "2.1")
+@Plugin(name = "PolarLogs", version = "2.2")
 @Dependency("PolarLoader")
 public class PolarLogs extends JavaPlugin {
 
@@ -49,6 +49,7 @@ public class PolarLogs extends JavaPlugin {
                 getLogger().severe("Failed to register command: " + e.getMessage());
             }
         }
+        logs = Logs.loadFromConfigSection(getConfig().getConfigurationSection("logs"));
         loadLogs();
     }
 

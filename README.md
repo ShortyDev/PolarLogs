@@ -12,28 +12,38 @@ If you have any suggestions, feel free to open an issue or a pull request.
 
 ## Command permissions
 
-| Command                                       | Description                     | Permission                    |
-|-----------------------------------------------|---------------------------------|-------------------------------|
-| /polarlogs                                    | Show help                       | polarlogs.command             |
-| /polarlogs reload                             | Reload the config               | polarlogs.command.reload      |
-| /polarlogs trange                             | See help page for time ranges   | polarlogs.command.logs        |
-| /polarlogs webhooks test                      | Test webhook                    | polarlogs.command.webhooks    |
-| /polarlogs info (player)                      | Show information about a player | polarlogs.command.info.player |
-| /polarlogs view ([query](#View-query)) (page) | View logs (query desc. below)   | polarlogs.command.view        |
+| Command                                         | Description                     | Permission                    |
+|-------------------------------------------------|---------------------------------|-------------------------------|
+| /polarlogs                                      | Show help                       | polarlogs.command             |
+| /polarlogs reload                               | Reload the config               | polarlogs.command.reload      |
+| /polarlogs trange                               | See help page for time ranges   | polarlogs.command.logs        |
+| /polarlogs webhooks test                        | Test webhook                    | polarlogs.command.webhooks    |
+| /polarlogs info (player)                        | Show information about a player | polarlogs.command.info.player |
+| /polarlogs view ([query](#View-query)) (page)   | View logs (query desc. below)   | polarlogs.command.view        |
+| /polarlogs export ([query](#View-query)) (page) | Export logs (query desc. below) | polarlogs.command.export      |
 
 ### View query
+
 The query argument allows to filter for player and context.
 
 The general format for filtering by context only is `c:<context>`. For example, `c:global`.
 
-The general format for filtering by player is `p:<player>`. For example, `p:Shorty`. By appending `@<context>` to the player name, you can filter by player and context. For example, `p:Shorty@global`.
+The general format for filtering by player is `p:<player>`. For example, `p:Shorty`. By appending `@<context>` to the
+player name, you can filter by player and context. For example, `p:Shorty@global`.
 
-In order to reduce the logs to a specific time range, you can append `:<time range>` to the player or context name. For example, `p:Shorty:today`, `c:global:1d` or `p:Shorty@global:1w`.
+In order to reduce the logs to a specific time range, you can append `:<time range>` to the player or context name. For
+example, `p:Shorty:today`, `c:global:1d` or `p:Shorty@global:1w`.
 
 Extended permissions:
+
 - `polarlogs.command.view.player` - Allows viewing logs of a specific player
 - `polarlogs.command.view.player.context` - Allows viewing logs of a specific player and context
 - `polarlogs.command.view.context` - Allows viewing logs of a specific context
+
+Extended permissions for exporting:
+- `polarlogs.command.export.player` - Allows exporting logs of a specific player
+- `polarlogs.command.export.player.context` - Allows exporting logs of a specific player and context
+- `polarlogs.command.export.context` - Allows exporting logs of a specific context
 
 ## Time range
 
