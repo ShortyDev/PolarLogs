@@ -348,6 +348,7 @@ public class PolarLogsCommand extends Command {
                         hoverTemplate = "§cUnknown log type!";
                         break;
                 }
+                String logEntryDetails = logEntry.details.replaceAll("<.*>", "");
                 String message = messageTemplate
                         .replace("%PLAYER_NAME%", logEntry.playerName)
                         .replace("%PLAYER_UUID%", logEntry.playerUuid)
@@ -358,7 +359,7 @@ public class PolarLogsCommand extends Command {
                         .replace("%VL%", String.valueOf(logEntry.vl))
                         .replace("%CHECK_TYPE%", logEntry.checkType)
                         .replace("%CHECK_NAME%", logEntry.checkName)
-                        .replace("%DETAILS%", logEntry.details)
+                        .replace("%DETAILS%", logEntryDetails)
                         .replace("%PUNISHMENT%", logEntry.punishmentType)
                         .replace("%REASON%", logEntry.punishmentReason);
                 String hoverText = hoverTemplate
@@ -371,7 +372,7 @@ public class PolarLogsCommand extends Command {
                         .replace("%VL%", String.valueOf(logEntry.vl))
                         .replace("%CHECK_TYPE%", logEntry.checkType)
                         .replace("%CHECK_NAME%", logEntry.checkName)
-                        .replace("%DETAILS%", logEntry.details)
+                        .replace("%DETAILS%", logEntryDetails)
                         .replace("%PUNISHMENT%", logEntry.punishmentType)
                         .replace("%REASON%", logEntry.punishmentReason);
                 message = ChatColor.translateAlternateColorCodes('&', message);
