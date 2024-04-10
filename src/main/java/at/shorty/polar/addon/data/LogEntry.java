@@ -1,6 +1,5 @@
 package at.shorty.polar.addon.data;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
