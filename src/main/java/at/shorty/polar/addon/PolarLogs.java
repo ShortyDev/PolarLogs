@@ -49,7 +49,6 @@ public class PolarLogs extends JavaPlugin {
                 getLogger().severe("Failed to register command: " + e.getMessage());
             }
         }
-        logs = Logs.loadFromConfigSection(getConfig().getConfigurationSection("logs"));
         loadLogs();
     }
 
