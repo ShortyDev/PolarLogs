@@ -476,7 +476,10 @@ public class PolarLogsCommand extends Command {
             if (args[0].equalsIgnoreCase("webhooks")) {
                 return Collections.singletonList("test");
             } else if (args[0].equalsIgnoreCase("info")) {
-                return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+                return Bukkit.getOnlinePlayers().stream()
+                        .map(Player::getName)
+                        .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
+                        .collect(Collectors.toList());
             } else if (args[0].equalsIgnoreCase("view") || args[0].equalsIgnoreCase("export")) {
                 if (args[1].endsWith(":") && args[1].length() > 2) {
                     if (args[1].substring(2, args[1].length() - 1).contains(":"))
