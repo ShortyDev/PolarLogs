@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PolarLogsCommand extends Command {
 
@@ -468,7 +469,9 @@ public class PolarLogsCommand extends Command {
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
         if (args.length == 1) {
-            return Arrays.asList("reload", "info", "trange", "webhooks", "view", "export");
+            return Stream.of("reload", "info", "trange", "webhooks", "view", "export")
+                    .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
+                    .collect(Collectors.toList());
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("webhooks")) {
                 return Collections.singletonList("test");
@@ -489,7 +492,11 @@ public class PolarLogsCommand extends Command {
                     } else if (args[1].contains("@")) {
                         return Collections.singletonList(args[1]);
                     }
-                    return Bukkit.getOnlinePlayers().stream().map(Player::getName).map(name -> "p:" + name).collect(Collectors.toList());
+                    return Bukkit.getOnlinePlayers().stream()
+                            .map(Player::getName)
+                            .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase().substring(2)))
+                            .map(name -> "p:" + name)
+                            .collect(Collectors.toList());
                 } else if (args[1].startsWith("c:")) {
                     if (args[1].length() > 2 && args[1].substring(2, args[1].length() - 1).contains(":"))
                         return Collections.singletonList(args[1]);
