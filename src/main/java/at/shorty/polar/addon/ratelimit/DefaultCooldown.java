@@ -12,35 +12,42 @@ import java.util.concurrent.TimeUnit;
 public abstract class DefaultCooldown {
 
     @Setter
-    private transient Map<String, Object> cache;
+    private transient Map<String, Object> webhooks;
+    private transient Map<String, Object> logs;
 
     public void initializeCache(int time, TimeUnit timeUnit) {
-        if (cache != null) throw new IllegalStateException("Cache already initialized");
-        cache = ExpiringMap.builder()
+        webhooks = ExpiringMap.builder()
+                .expiration(time, timeUnit)
+                .build();
+        logs = ExpiringMap.builder()
                 .expiration(time, timeUnit)
                 .build();
     }
 
-    public boolean handleCooldown(UserCancellableEvent event) {
-        if (cache == null) throw new IllegalStateException("Cache not initialized");
-        if (isOnCooldown(event)) {
+    public boolean handleCooldown(UserCancellableEvent event, Type type) {
+        if (webhooks == null || logs == null) throw new IllegalStateException("Cache not initialized");
+        if (isOnCooldown(event, type)) {
             return true;
         }
-        applyCooldown(event);
+        applyCooldown(event, type);
         return false;
     }
 
-    private void applyCooldown(UserCancellableEvent event) {
-        if (cache == null) throw new IllegalStateException("Cache not initialized");
-        if (isOnCooldown(event)) return;
+    private void applyCooldown(UserCancellableEvent event, Type type) {
+        if (webhooks == null || logs == null) throw new IllegalStateException("Cache not initialized");
+        if (isOnCooldown(event, type)) return;
         String key = buildKey(event);
-        cache.put(key, null);
+        if (type == Type.WEBHOOK) {
+            webhooks.put(key, null);
+        } else {
+            logs.put(key, null);
+        }
     }
 
-    private boolean isOnCooldown(UserCancellableEvent event) {
-        if (cache == null) throw new IllegalStateException("Cache not initialized");
+    private boolean isOnCooldown(UserCancellableEvent event, Type type) {
+        if (webhooks == null || logs == null) throw new IllegalStateException("Cache not initialized");
         String key = buildKey(event);
-        return cache.containsKey(key);
+        return type == Type.WEBHOOK ? webhooks.containsKey(key) : logs.containsKey(key);
     }
 
     private String buildKey(UserCancellableEvent event) {
@@ -51,6 +58,10 @@ public abstract class DefaultCooldown {
             key += ((CloudDetectionEvent) event).cloudCheckType().name();
         }
         return key;
+    }
+
+    public enum Type {
+        LOGS, WEBHOOK
     }
 
 }

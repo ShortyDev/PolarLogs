@@ -30,13 +30,14 @@ public class MitigationListener extends DefaultCooldown implements Consumer<Miti
 
     @Override
     public void accept(MitigationEvent mitigationEvent) {
-        if (mitigation.getCooldownPerPlayerAndType() > 0 && handleCooldown(mitigationEvent)) return;
         if (mitigation.isEnabled() && mitigation.isNotificationEnabled(mitigationEvent.check().type()) && mitigationEvent.check().violationLevel() >= mitigation.getMinVl()) {
+            if (mitigation.getCooldownPerPlayerAndType() > 0 && handleCooldown(mitigationEvent, Type.WEBHOOK)) return;
             String content = WebhookComposer.composeMitigationWebhookMessage(mitigation, mitigationEvent);
             content = WebhookComposer.replaceGlobalPlaceholders(content, mitigationEvent.user());
             DiscordWebhook.sendWebhook(mitigation.getWebhookUrl(), content);
         }
         if (logs.isEnabled() && logs.getStore().isMitigation() && mitigationEvent.check().violationLevel() >= logs.getMitigationTuning().getMinVl()) {
+            if (mitigation.getCooldownPerPlayerAndType() > 0 && handleCooldown(mitigationEvent, Type.LOGS)) return;
             Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () -> logs.logMitigation(mitigationEvent.user(), mitigationEvent.check(), mitigationEvent.details()));
         }
     }
