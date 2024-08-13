@@ -14,7 +14,7 @@ import top.polar.api.loader.LoaderApi;
 import java.lang.reflect.Field;
 import java.util.Set;
 
-@Plugin(name = "PolarLogs", version = "2.2")
+@Plugin(name = "PolarLogs", version = "2.3")
 @Author("ShortyDev")
 @Dependency("PolarLoader")
 public class PolarLogs extends JavaPlugin {
