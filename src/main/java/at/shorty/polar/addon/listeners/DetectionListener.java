@@ -37,10 +37,11 @@ public class DetectionListener extends DefaultCooldown implements Consumer<Detec
             DiscordWebhook.sendWebhook(detection.getWebhookUrl(), content);
         }
         if (logs.isEnabled() && logs.getStore().isDetection()) {
-            if (!detectionAlertEvent.details().equals("This is a test alert")) {
-                if (detection.getCooldownPerPlayerAndType() > 0 && detection.handleCooldown(detectionAlertEvent, Type.LOGS)) return;
-                Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () -> logs.logDetection(detectionAlertEvent.user(), detectionAlertEvent.check(), detectionAlertEvent.details()));
+            if (detectionAlertEvent.details().equals("This is a test alert")) {
+                return;
             }
+            if (detection.getCooldownPerPlayerAndType() > 0 && detection.handleCooldown(detectionAlertEvent, Type.LOGS)) return;
+            Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () -> logs.logDetection(detectionAlertEvent.user(), detectionAlertEvent.check(), detectionAlertEvent.details()));
         }
     }
 }
