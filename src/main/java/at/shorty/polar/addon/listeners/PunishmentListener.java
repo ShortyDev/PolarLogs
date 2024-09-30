@@ -5,6 +5,7 @@ import at.shorty.polar.addon.config.Logs;
 import at.shorty.polar.addon.config.Punishment;
 import at.shorty.polar.addon.hook.DiscordWebhook;
 import at.shorty.polar.addon.hook.WebhookComposer;
+import at.shorty.polar.addon.ratelimit.DefaultCooldown;
 import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
 import top.polar.api.user.event.PunishmentEvent;
@@ -12,7 +13,7 @@ import top.polar.api.user.event.PunishmentEvent;
 import java.util.function.Consumer;
 
 @AllArgsConstructor
-public class PunishmentListener implements Consumer<PunishmentEvent> {
+public class PunishmentListener extends DefaultCooldown implements Consumer<PunishmentEvent> {
 
     private Punishment punishment;
     private Logs logs;
@@ -25,11 +26,13 @@ public class PunishmentListener implements Consumer<PunishmentEvent> {
     @Override
     public void accept(PunishmentEvent punishmentEvent) {
         if (punishment.isEnabled() && String.join("", punishment.getTypesEnabled()).contains(punishmentEvent.type().name())) {
+            if (punishment.getCooldownPerPlayer() > 0 && handleCooldown(punishmentEvent, DefaultCooldown.Type.WEBHOOK)) return;
             String content = WebhookComposer.composePunishmentWebhookMessage(punishment, punishmentEvent);
             content = WebhookComposer.replaceGlobalPlaceholders(content, punishmentEvent.user());
             DiscordWebhook.sendWebhook(punishment.getWebhookUrl(), content);
         }
         if (logs.isEnabled() && logs.getStore().isPunishment()) {
+            if (punishment.getCooldownPerPlayer() > 0 && handleCooldown(punishmentEvent, Type.LOGS)) return;
             Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () -> logs.logPunishment(punishmentEvent.user(), punishmentEvent.type(), punishmentEvent.reason()));
         }
     }
