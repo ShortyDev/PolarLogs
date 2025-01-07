@@ -22,6 +22,8 @@ If you have any suggestions, feel free to open an issue or a pull request.
 | /polarlogs view ([query](#View-query)) (page)   | View logs (query desc. below)   | polarlogs.command.view        |
 | /polarlogs export ([query](#View-query)) (page) | Export logs (query desc. below) | polarlogs.command.export      |
 
+In order for any subcommand to work, `polarlogs.command` needs to be set.
+
 ### View query
 
 The query argument allows to filter for player and context.
