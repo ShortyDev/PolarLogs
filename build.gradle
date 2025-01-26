@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'at.shorty'
-version = '2.4-SNAPSHOT'
+version = '2.4.1-SNAPSHOT'
 
 tasks.register('fatJar', Jar) {
     from {
