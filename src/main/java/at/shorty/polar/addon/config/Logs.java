@@ -1,9 +1,12 @@
 package at.shorty.polar.addon.config;
 
+import at.shorty.polar.addon.HikariPooledConnection;
 import at.shorty.polar.addon.PolarLogs;
 import at.shorty.polar.addon.data.LogCountData;
 import at.shorty.polar.addon.data.LogEntry;
 import at.shorty.polar.addon.util.TimeRange;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.Data;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
@@ -32,7 +35,7 @@ public class Logs {
     public transient MitigationTuning mitigationTuning;
     public transient String mitigationMessage, mitigationHoverText, detectionMessage, detectionHoverText, cloudDetectionMessage, cloudDetectionHoverText, punishmentMessage, punishmentHoverText;
     @Setter
-    private Connection connection;
+    private HikariDataSource connectionPool;
 
 
     public LogCountData getLogCountData(String context, String player, @Nullable TimeRange timeRange) throws SQLException {
@@ -43,76 +46,78 @@ public class Logs {
         Map<String, Integer> detection = new HashMap<>();
         Map<String, Integer> cloudDetection = new HashMap<>();
         Map<String, Integer> punishment = new HashMap<>();
-        PreparedStatement preparedStatement;
 
-        if (player != null) {
-            if (timeRange == null) {
-                preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? GROUP BY check_type, type;");
+        try (Connection connection = connectionPool.getConnection()) {
+            PreparedStatement preparedStatement;
+            if (player != null) {
+                if (timeRange == null) {
+                    preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? GROUP BY check_type, type;");
+                } else {
+                    preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY check_type, type;");
+                    preparedStatement.setLong(2, timeRange.start);
+                    preparedStatement.setLong(3, timeRange.end);
+                }
+                preparedStatement.setString(1, player);
             } else {
-                preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY check_type, type;");
-                preparedStatement.setLong(2, timeRange.start);
-                preparedStatement.setLong(3, timeRange.end);
-            }
-            preparedStatement.setString(1, player);
-        } else {
-            if (timeRange == null) {
-                preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " GROUP BY check_type, type;");
-            } else {
-                preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY check_type, type;");
-                preparedStatement.setLong(1, timeRange.start);
-                preparedStatement.setLong(2, timeRange.end);
-            }
-        }
-        preparedStatement.executeQuery();
-        try (ResultSet resultSet = preparedStatement.getResultSet()) {
-            while (resultSet.next()) {
-                String type = resultSet.getString(1);
-                String checkType = resultSet.getString(2);
-                if (checkType == null || type.equals("punishment")) continue;
-                int count = resultSet.getInt(3);
-                switch (type) {
-                    case "mitigation":
-                        mitigation.put(checkType, count);
-                        break;
-                    case "detection":
-                        detection.put(checkType, count);
-                        break;
-                    case "cloud_detection":
-                        cloudDetection.put(checkType, count);
-                        break;
+                if (timeRange == null) {
+                    preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " GROUP BY check_type, type;");
+                } else {
+                    preparedStatement = connection.prepareStatement("SELECT type, check_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY check_type, type;");
+                    preparedStatement.setLong(1, timeRange.start);
+                    preparedStatement.setLong(2, timeRange.end);
                 }
             }
-        } finally {
-            preparedStatement.close();
-        }
-        PreparedStatement punishmentStatement;
-        if (player != null) {
-            if (timeRange == null) {
-                punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? AND type = 'punishment' GROUP BY punishment_type;");
+            preparedStatement.executeQuery();
+            try (ResultSet resultSet = preparedStatement.getResultSet()) {
+                while (resultSet.next()) {
+                    String type = resultSet.getString(1);
+                    String checkType = resultSet.getString(2);
+                    if (checkType == null || type.equals("punishment")) continue;
+                    int count = resultSet.getInt(3);
+                    switch (type) {
+                        case "mitigation":
+                            mitigation.put(checkType, count);
+                            break;
+                        case "detection":
+                            detection.put(checkType, count);
+                            break;
+                        case "cloud_detection":
+                            cloudDetection.put(checkType, count);
+                            break;
+                    }
+                }
+            } finally {
+                preparedStatement.close();
+            }
+            PreparedStatement punishmentStatement;
+            if (player != null) {
+                if (timeRange == null) {
+                    punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? AND type = 'punishment' GROUP BY punishment_type;");
+                } else {
+                    punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? AND type = 'punishment' AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY punishment_type;");
+                    punishmentStatement.setLong(2, timeRange.start);
+                    punishmentStatement.setLong(3, timeRange.end);
+                }
+                punishmentStatement.setString(1, player);
             } else {
-                punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE player_name = ? AND type = 'punishment' AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY punishment_type;");
-                punishmentStatement.setLong(2, timeRange.start);
-                punishmentStatement.setLong(3, timeRange.end);
+                if (timeRange == null) {
+                    punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE type = 'punishment' GROUP BY punishment_type;");
+                } else {
+                    punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE type = 'punishment' AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY punishment_type;");
+                    punishmentStatement.setLong(1, timeRange.start);
+                    punishmentStatement.setLong(2, timeRange.end);
+                }
             }
-            punishmentStatement.setString(1, player);
-        } else {
-            if (timeRange == null) {
-                punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE type = 'punishment' GROUP BY punishment_type;");
-            } else {
-                punishmentStatement = connection.prepareStatement("SELECT punishment_type, COUNT(*) as count FROM polar_logs_" + context + " WHERE type = 'punishment' AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? GROUP BY punishment_type;");
-                punishmentStatement.setLong(1, timeRange.start);
-                punishmentStatement.setLong(2, timeRange.end);
+            punishmentStatement.executeQuery();
+            try (ResultSet resultSet = punishmentStatement.getResultSet()) {
+                while (resultSet.next()) {
+                    String type = resultSet.getString(1);
+                    int count = resultSet.getInt(2);
+                    punishment.put(type, count);
+                }
+            } finally {
+                punishmentStatement.close();
             }
-        }
-        punishmentStatement.executeQuery();
-        try (ResultSet resultSet = punishmentStatement.getResultSet()) {
-            while (resultSet.next()) {
-                String type = resultSet.getString(1);
-                int count = resultSet.getInt(2);
-                punishment.put(type, count);
-            }
-        } finally {
-            punishmentStatement.close();
         }
         return new LogCountData(mitigation, detection, cloudDetection, punishment);
     }
@@ -121,34 +126,36 @@ public class Logs {
         if (!context.matches("^[a-zA-Z0-9_]+$")) {
             throw new IllegalArgumentException("Invalid log context name, must be [a-zA-Z0-9_]");
         }
-        PreparedStatement preparedStatement;
-        if (player != null) {
-            if (timeRange == null) {
-                preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " WHERE player_name = ? ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
+        try (Connection connection = connectionPool.getConnection()) {
+            PreparedStatement preparedStatement;
+            if (player != null) {
+                if (timeRange == null) {
+                    preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " WHERE player_name = ? ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
+                } else {
+                    preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " WHERE player_name = ? AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
+                    preparedStatement.setLong(2, timeRange.start);
+                    preparedStatement.setLong(3, timeRange.end);
+                }
+                preparedStatement.setString(1, player);
+                preparedStatement.setInt(timeRange == null ? 2 : 4, limit);
+                preparedStatement.setInt(timeRange == null ? 3 : 5, offset);
             } else {
-                preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " WHERE player_name = ? AND ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
-                preparedStatement.setLong(2, timeRange.start);
-                preparedStatement.setLong(3, timeRange.end);
+                if (timeRange == null) {
+                    preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
+                } else {
+                    preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " WHERE ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
+                    preparedStatement.setLong(1, timeRange.start);
+                    preparedStatement.setLong(2, timeRange.end);
+                }
+                preparedStatement.setInt(timeRange == null ? 1 : 3, limit);
+                preparedStatement.setInt(timeRange == null ? 2 : 4, offset);
             }
-            preparedStatement.setString(1, player);
-            preparedStatement.setInt(timeRange == null ? 2 : 4, limit);
-            preparedStatement.setInt(timeRange == null ? 3 : 5, offset);
-        } else {
-            if (timeRange == null) {
-                preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
-            } else {
-                preparedStatement = connection.prepareStatement("SELECT * FROM polar_logs_" + context + " WHERE ROUND(UNIX_TIMESTAMP(timestamp) * 1000) BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ? OFFSET ?;");
-                preparedStatement.setLong(1, timeRange.start);
-                preparedStatement.setLong(2, timeRange.end);
+            preparedStatement.executeQuery();
+            try {
+                return getLogEntries(preparedStatement);
+            } finally {
+                preparedStatement.close();
             }
-            preparedStatement.setInt(timeRange == null ? 1 : 3, limit);
-            preparedStatement.setInt(timeRange == null ? 2 : 4, offset);
-        }
-        preparedStatement.executeQuery();
-        try {
-            return getLogEntries(preparedStatement);
-        } finally {
-            preparedStatement.close();
         }
     }
 
@@ -187,7 +194,8 @@ public class Logs {
         if (brand.length() > 64) {
             brand = brand.substring(0, 64);
         }
-        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO polar_logs_" + context + " (type, player_name, player_uuid, player_version, player_latency, player_brand, vl, check_type, check_name, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO polar_logs_" + context + " (type, player_name, player_uuid, player_version, player_latency, player_brand, vl, check_type, check_name, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
             preparedStatement.setString(1, "mitigation");
             preparedStatement.setString(2, user.username());
             preparedStatement.setString(3, user.uuid().toString());
@@ -214,7 +222,8 @@ public class Logs {
         if (brand.length() > 64) {
             brand = brand.substring(0, 64);
         }
-        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO polar_logs_" + context + " (type, player_name, player_uuid, player_version, player_latency, player_brand, vl, check_type, check_name, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO polar_logs_" + context + " (type, player_name, player_uuid, player_version, player_latency, player_brand, vl, check_type, check_name, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
             preparedStatement.setString(1, "detection");
             preparedStatement.setString(2, user.username());
             preparedStatement.setString(3, user.uuid().toString());
@@ -241,7 +250,8 @@ public class Logs {
         if (brand.length() > 64) {
             brand = brand.substring(0, 64);
         }
-        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO polar_logs_" + context + " (type, player_name, player_uuid, player_version, player_latency, player_brand, check_type, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO polar_logs_" + context + " (type, player_name, player_uuid, player_version, player_latency, player_brand, check_type, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
             preparedStatement.setString(1, "cloud_detection");
             preparedStatement.setString(2, user.username());
             preparedStatement.setString(3, user.uuid().toString());
@@ -258,7 +268,8 @@ public class Logs {
 
     public void logPunishment(User user, PunishmentType type, String reason) {
         if (!store.isPunishment()) return;
-        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO polar_logs_" + context + " (type, player_name, player_uuid, punishment_type, punishment_reason) VALUES (?, ?, ?, ?, ?)")) {
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO polar_logs_" + context + " (type, player_name, player_uuid, punishment_type, punishment_reason) VALUES (?, ?, ?, ?, ?)")) {
             preparedStatement.setString(1, "punishment");
             preparedStatement.setString(2, user.username());
             preparedStatement.setString(3, user.uuid().toString());
@@ -291,53 +302,37 @@ public class Logs {
     }
 
     public CompletableFuture<Boolean> establishConnection() {
-        try {
-            loadDriver("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            PolarLogs.getPlugin(PolarLogs.class).getLogger().warning("Couldn't load com.mysql.cj.jdbc.Driver, falling back to com.mysql.jdbc.Driver");
-            try {
-                loadDriver("com.mysql.jdbc.Driver");
-            } catch (ClassNotFoundException ex) {
-                PolarLogs.getPlugin(PolarLogs.class).getLogger().severe("Failed to load MySQL driver.");
-                return CompletableFuture.completedFuture(false);
-            }
-        }
+        HikariConfig config = HikariPooledConnection.prepareConfig(database, 2);
+        HikariPooledConnection pooledConnection = new HikariPooledConnection(config);
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            try {
-                DriverManager.setLoginTimeout(5);
-                String url = "jdbc:mysql://" + database.getSqlHost() + ":" + database.getSqlPort() + "/" + database.getSqlDatabase() + "?autoReconnect=true&useSSL=" + database.isUseSsl();
-                connection = DriverManager.getConnection(url, database.getSqlUsername(), database.getSqlPassword());
-                try {
-                    PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS polar_logs_" + context + " (" +
-                            "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                            "type VARCHAR(255), " +
-                            "player_name VARCHAR(16), " +
-                            "player_uuid VARCHAR(36), " +
-                            "player_version VARCHAR(20), " +
-                            "player_latency INT, " +
-                            "player_brand VARCHAR(64), " +
-                            "vl DOUBLE, " +
-                            "check_type VARCHAR(64), " +
-                            "check_name VARCHAR(64), " +
-                            "details VARCHAR(1024), " +
-                            "punishment_type VARCHAR(16), " +
-                            "punishment_reason VARCHAR(64), " +
-                            "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
-                    statement.execute();
-                    statement.close();
+            pooledConnection.initializePool();
+            connectionPool = pooledConnection.getPool();
+            try (Connection connection = connectionPool.getConnection()) {
+                PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS polar_logs_" + context + " (" +
+                        "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                        "type VARCHAR(255), " +
+                        "player_name VARCHAR(16), " +
+                        "player_uuid VARCHAR(36), " +
+                        "player_version VARCHAR(20), " +
+                        "player_latency INT, " +
+                        "player_brand VARCHAR(64), " +
+                        "vl DOUBLE, " +
+                        "check_type VARCHAR(64), " +
+                        "check_name VARCHAR(64), " +
+                        "details VARCHAR(1024), " +
+                        "punishment_type VARCHAR(16), " +
+                        "punishment_reason VARCHAR(64), " +
+                        "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+                statement.execute();
+                statement.close();
 
-                    PreparedStatement deleteExpiredLogs = connection.prepareStatement("DELETE FROM polar_logs_" + context + " WHERE timestamp < DATE_SUB(NOW(), INTERVAL " + expireAfterDays + " DAY)");
-                    int updated = deleteExpiredLogs.executeUpdate();
-                    if (updated > 0) {
-                        PolarLogs.getPlugin(PolarLogs.class).getLogger().info("Deleted " + updated + " expired logs. (Logs older than " + expireAfterDays + " day(s))");
-                    }
-                    deleteExpiredLogs.close();
-                    future.complete(true);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    future.complete(false);
+                PreparedStatement deleteExpiredLogs = connection.prepareStatement("DELETE FROM polar_logs_" + context + " WHERE timestamp < DATE_SUB(NOW(), INTERVAL " + expireAfterDays + " DAY)");
+                int updated = deleteExpiredLogs.executeUpdate();
+                if (updated > 0) {
+                    PolarLogs.getPlugin(PolarLogs.class).getLogger().info("Deleted " + updated + " expired logs. (Logs older than " + expireAfterDays + " day(s))");
                 }
+                future.complete(true);
             } catch (SQLException e) {
                 e.printStackTrace();
                 future.complete(false);
@@ -346,24 +341,15 @@ public class Logs {
         return future;
     }
 
-    public void loadDriver(String className) throws ClassNotFoundException {
-        Class.forName(className);
-    }
-
     public void dropConnection() {
-        if (connection != null) {
-            try {
-                connection.close();
-                PolarLogs.getPlugin(PolarLogs.class).getLogger().info("Closed database connection.");
-            } catch (SQLException e) {
-                e.printStackTrace();
-                PolarLogs.getPlugin(PolarLogs.class).getLogger().severe("Failed to close database connection.");
-            }
+        if (connectionPool != null) {
+            connectionPool.close();
+            PolarLogs.getPlugin(PolarLogs.class).getLogger().info("Closed database connection.");
         }
     }
 
     public boolean isConnected() {
-        return connection != null;
+        return connectionPool != null && !connectionPool.isClosed();
     }
 
     @Data
