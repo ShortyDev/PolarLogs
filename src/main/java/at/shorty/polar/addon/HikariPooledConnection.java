@@ -28,12 +28,12 @@ public class HikariPooledConnection {
     public static HikariConfig prepareConfig(Logs.Database credentials, int maxPoolSize) {
         String driver = "com.mysql.cj.jdbc.Driver";
         try {
-            loadDriver("com.mysql.cj.jdbc.Driver");
+            loadDriver(driver);
         } catch (ClassNotFoundException e) {
             PolarLogs.getPlugin(PolarLogs.class).getLogger().warning("Couldn't load com.mysql.cj.jdbc.Driver, falling back to com.mysql.jdbc.Driver");
             try {
-                loadDriver("com.mysql.jdbc.Driver");
                 driver = "com.mysql.jdbc.Driver";
+                loadDriver(driver);
             } catch (ClassNotFoundException ex) {
                 PolarLogs.getPlugin(PolarLogs.class).getLogger().severe("Failed to load MySQL driver. Logging disabled.");
                 return null;
