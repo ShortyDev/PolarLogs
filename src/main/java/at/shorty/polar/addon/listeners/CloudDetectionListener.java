@@ -30,6 +30,7 @@ public class CloudDetectionListener extends DefaultCooldown implements Consumer<
 
     @Override
     public void accept(CloudDetectionEvent cloudDetectionEvent) {
+        if (cloudDetectionEvent.cancelled()) return;
         if (cloudDetection.isEnabled() && cloudDetection.isNotificationEnabled(cloudDetectionEvent.cloudCheckType())) {
             if (cloudDetection.getCooldownPerPlayerAndType() > 0 && cloudDetection.handleCooldown(cloudDetectionEvent, Type.WEBHOOK)) return;
             String content = WebhookComposer.composeCloudDetectionWebhookMessage(cloudDetection, cloudDetectionEvent);

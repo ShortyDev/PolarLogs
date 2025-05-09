@@ -30,6 +30,7 @@ public class DetectionListener extends DefaultCooldown implements Consumer<Detec
 
     @Override
     public void accept(DetectionAlertEvent detectionAlertEvent) {
+        if (detectionAlertEvent.cancelled()) return;
         if (detection.isEnabled() && detection.isNotificationEnabled(detectionAlertEvent.check().type())) {
             if (detection.getCooldownPerPlayerAndType() > 0 && detection.handleCooldown(detectionAlertEvent, Type.WEBHOOK)) return;
             String content = WebhookComposer.composeDetectionWebhookMessage(detection, detectionAlertEvent);

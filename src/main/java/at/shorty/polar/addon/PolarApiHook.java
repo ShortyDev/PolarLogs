@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import top.polar.api.PolarApi;
 import top.polar.api.PolarApiAccessor;
 import top.polar.api.check.Check;
+import top.polar.api.event.listener.ListenerPriority;
 import top.polar.api.exception.PolarNotLoadedException;
 import top.polar.api.user.User;
 import top.polar.api.user.connection.ClientVersion;
@@ -46,10 +47,10 @@ public class PolarApiHook implements Runnable {
             cloudDetectionListener = new CloudDetectionListener(cloudDetection, logs);
             punishmentListener = new PunishmentListener(punishment, logs);
             PolarApi polarApi = PolarApiAccessor.access().get();
-            polarApi.events().repository().registerListener(MitigationEvent.class, mitigationListener);
-            polarApi.events().repository().registerListener(DetectionAlertEvent.class, detectionListener);
-            polarApi.events().repository().registerListener(CloudDetectionEvent.class, cloudDetectionListener);
-            polarApi.events().repository().registerListener(PunishmentEvent.class, punishmentListener);
+            polarApi.events().repository().registerListener(MitigationEvent.class, mitigationListener, ListenerPriority.RUN_LAST);
+            polarApi.events().repository().registerListener(DetectionAlertEvent.class, detectionListener, ListenerPriority.RUN_LAST);
+            polarApi.events().repository().registerListener(CloudDetectionEvent.class, cloudDetectionListener, ListenerPriority.RUN_LAST);
+            polarApi.events().repository().registerListener(PunishmentEvent.class, punishmentListener, ListenerPriority.RUN_LAST);
         } catch (PolarNotLoadedException e) {
             throw new RuntimeException(e);
         }

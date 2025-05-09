@@ -30,6 +30,7 @@ public class MitigationListener extends DefaultCooldown implements Consumer<Miti
 
     @Override
     public void accept(MitigationEvent mitigationEvent) {
+        if (mitigationEvent.cancelled()) return;
         if (mitigation.isEnabled() && mitigation.isNotificationEnabled(mitigationEvent.check().type()) && mitigationEvent.check().violationLevel() >= mitigation.getMinVl()) {
             if (mitigation.getCooldownPerPlayerAndType() > 0 && handleCooldown(mitigationEvent, Type.WEBHOOK)) return;
             String content = WebhookComposer.composeMitigationWebhookMessage(mitigation, mitigationEvent);

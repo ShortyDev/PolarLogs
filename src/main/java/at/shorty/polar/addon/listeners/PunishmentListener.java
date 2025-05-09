@@ -31,6 +31,7 @@ public class PunishmentListener extends DefaultCooldown implements Consumer<Puni
 
     @Override
     public void accept(PunishmentEvent punishmentEvent) {
+        if (punishmentEvent.cancelled()) return;
         if (punishment.isEnabled() && String.join("", punishment.getTypesEnabled()).contains(punishmentEvent.type().name())) {
             if (punishment.getCooldownPerPlayer() > 0 && handleCooldown(punishmentEvent, DefaultCooldown.Type.WEBHOOK)) return;
             String content = WebhookComposer.composePunishmentWebhookMessage(punishment, punishmentEvent);
