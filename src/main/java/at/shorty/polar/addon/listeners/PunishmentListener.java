@@ -10,13 +10,19 @@ import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
 import top.polar.api.user.event.PunishmentEvent;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-@AllArgsConstructor
 public class PunishmentListener extends DefaultCooldown implements Consumer<PunishmentEvent> {
 
     private Punishment punishment;
     private Logs logs;
+
+    public PunishmentListener(Punishment punishment, Logs logs) {
+        this.punishment = punishment;
+        this.logs = logs;
+        initializeCache(punishment.getCooldownPerPlayer(), TimeUnit.SECONDS);
+    }
 
     public void reloadConfig(Punishment punishment, Logs logs) {
         this.punishment = punishment;

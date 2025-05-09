@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.util.concurrent.TimeUnit;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Punishment extends DiscordWebhook {
@@ -23,6 +25,7 @@ public class Punishment extends DiscordWebhook {
         punishment.setCooldownPerPlayer(section.getInt("cooldown_per_player"));
         punishment.setContent(section.getString("content"));
         punishment.setEmbeds(new Embed[]{Embed.loadFromConfigSection(section.getConfigurationSection("embed"))});
+        punishment.initializeCache(punishment.getCooldownPerPlayer(), TimeUnit.SECONDS);
         return punishment;
     }
 
