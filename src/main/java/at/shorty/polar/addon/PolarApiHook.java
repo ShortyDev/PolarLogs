@@ -13,12 +13,10 @@ import top.polar.api.check.Check;
 import top.polar.api.event.listener.ListenerPriority;
 import top.polar.api.exception.PolarNotLoadedException;
 import top.polar.api.user.User;
+import top.polar.api.user.config.ConfigOverride;
 import top.polar.api.user.connection.ClientVersion;
 import top.polar.api.user.connection.PlayerConnection;
-import top.polar.api.user.event.CloudDetectionEvent;
-import top.polar.api.user.event.DetectionAlertEvent;
-import top.polar.api.user.event.MitigationEvent;
-import top.polar.api.user.event.PunishmentEvent;
+import top.polar.api.user.event.*;
 import top.polar.api.user.event.type.CheckType;
 import top.polar.api.user.event.type.PunishmentType;
 import top.polar.api.user.settings.AlertSettings;
@@ -133,6 +131,11 @@ public class PolarApiHook implements Runnable {
                                 return 10;
                             }
                         };
+                    }
+
+                    @Override
+                    public ConfigOverride configOverride() {
+                        return null;
                     }
 
                     @Override

@@ -42,7 +42,8 @@ public class DetectionListener extends DefaultCooldown implements Consumer<Detec
                 return;
             }
             if (detection.getCooldownPerPlayerAndType() > 0 && detection.handleCooldown(detectionAlertEvent, Type.LOGS)) return;
-            Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () -> logs.logDetection(detectionAlertEvent.user(), detectionAlertEvent.check(), detectionAlertEvent.details()));
+            Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class),
+                    () -> logs.logDetection(detectionAlertEvent.user(), detectionAlertEvent.check(), detectionAlertEvent.details()));
         }
     }
 }

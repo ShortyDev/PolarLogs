@@ -40,7 +40,8 @@ public class PunishmentListener extends DefaultCooldown implements Consumer<Puni
         }
         if (logs.isEnabled() && logs.getStore().isPunishment()) {
             if (punishment.getCooldownPerPlayer() > 0 && handleCooldown(punishmentEvent, Type.LOGS)) return;
-            Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () -> logs.logPunishment(punishmentEvent.user(), punishmentEvent.type(), punishmentEvent.reason()));
+            Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () ->
+                    logs.logPunishment(punishmentEvent.user(), punishmentEvent.type(), punishmentEvent.reason()));
         }
     }
 }

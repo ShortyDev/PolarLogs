@@ -39,7 +39,8 @@ public class MitigationListener extends DefaultCooldown implements Consumer<Miti
         }
         if (logs.isEnabled() && logs.getStore().isMitigation() && mitigationEvent.check().violationLevel() >= logs.getMitigationTuning().getMinVl()) {
             if (mitigation.getCooldownPerPlayerAndType() > 0 && handleCooldown(mitigationEvent, Type.LOGS)) return;
-            Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () -> logs.logMitigation(mitigationEvent.user(), mitigationEvent.check(), mitigationEvent.details()));
+            Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class),
+                    () -> logs.logMitigation(mitigationEvent.user(), mitigationEvent.check(), mitigationEvent.details()));
         }
     }
 }

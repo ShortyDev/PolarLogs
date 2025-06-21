@@ -3,6 +3,7 @@ package at.shorty.polar.addon;
 import at.shorty.polar.addon.commands.PolarLogsCommand;
 import at.shorty.polar.addon.config.*;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
