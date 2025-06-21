@@ -3,7 +3,6 @@ package at.shorty.polar.addon;
 import at.shorty.polar.addon.commands.PolarLogsCommand;
 import at.shorty.polar.addon.config.*;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,7 +14,7 @@ import top.polar.api.loader.LoaderApi;
 import java.lang.reflect.Field;
 import java.util.Set;
 
-@Plugin(name = "PolarLogs", version = "2.5.2")
+@Plugin(name = "PolarLogs", version = "2.6.0")
 @Author("ShortyDev")
 @Dependency("PolarLoader")
 public class PolarLogs extends JavaPlugin {
