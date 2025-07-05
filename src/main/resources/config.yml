@@ -45,6 +45,7 @@ logs:
       - 'PHASE'
       - 'CLOUD'
     min_vl: 5 # Minimum VL to store a mitigation log
+    include_verbose: false
   detection:
     message: '&7%PLAYER_NAME% %PLAYER_CLIENT_VERSION_NAME% (%PLAYER_CLIENT_BRAND%) (%PLAYER_LATENCY%ms) &8- &c%VL% VL &b%CHECK_TYPE%'
     hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%\n\n&r%DETAILS%'

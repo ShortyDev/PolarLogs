@@ -33,7 +33,7 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.22")
     compileOnly("org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT")
     compileOnly("org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT")
-    compileOnly("top.polar:api:2.1.3")
+    compileOnly("top.polar:api:2.2.0")
     implementation("com.zaxxer:HikariCP:6.3.0")
     implementation("net.jodah:expiringmap:0.5.10")
     annotationProcessor("org.projectlombok:lombok:1.18.22")

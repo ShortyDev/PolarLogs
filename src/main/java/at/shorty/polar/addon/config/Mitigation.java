@@ -17,6 +17,7 @@ public class Mitigation extends DiscordWebhook {
     private transient String webhookUrl;
     private transient boolean enabled;
     private transient boolean roundVl;
+    private transient boolean includeVerbose;
     private transient int cooldownPerPlayerAndType;
     private transient String[] notifications;
     private transient String[] detailFilters;
@@ -38,6 +39,7 @@ public class Mitigation extends DiscordWebhook {
         mitigation.setContent(section.getString("content"));
         mitigation.setEmbeds(new Embed[]{Embed.loadFromConfigSection(section.getConfigurationSection("embed"))});
         mitigation.initializeCache(mitigation.getCooldownPerPlayerAndType(), TimeUnit.SECONDS);
+        mitigation.setIncludeVerbose(section.getBoolean("include_verbose"));
         return mitigation;
     }
 

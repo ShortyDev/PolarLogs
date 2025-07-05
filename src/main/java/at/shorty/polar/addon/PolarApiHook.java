@@ -148,6 +148,10 @@ public class PolarApiHook implements Runnable {
                     }
 
                     @Override
+                    public void exemptFromCloud(boolean b) {
+                    }
+
+                    @Override
                     public boolean kick(String s) {
                         return false;
                     }
