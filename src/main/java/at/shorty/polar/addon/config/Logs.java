@@ -17,10 +17,7 @@ import top.polar.api.user.event.type.PunishmentType;
 
 import javax.annotation.Nullable;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @Data
@@ -39,6 +36,7 @@ public class Logs {
 
 
     public LogCountData getLogCountData(String context, String player, @Nullable TimeRange timeRange) throws SQLException {
+        if (!isConnected()) return null;
         if (!context.matches("^[a-zA-Z0-9_]+$")) {
             throw new IllegalArgumentException("Invalid log context name, must be [a-zA-Z0-9_]");
         }
@@ -123,6 +121,7 @@ public class Logs {
     }
 
     public List<LogEntry> getLogEntries(String context, String player, int limit, int offset, @Nullable TimeRange timeRange) throws SQLException {
+        if (!isConnected()) return Collections.emptyList();
         if (!context.matches("^[a-zA-Z0-9_]+$")) {
             throw new IllegalArgumentException("Invalid log context name, must be [a-zA-Z0-9_]");
         }
@@ -183,7 +182,7 @@ public class Logs {
     }
 
     public void logMitigation(User user, Check check, String details) {
-        if (!store.isMitigation()) return;
+        if (!store.isMitigation() || !isConnected()) return;
         if (mitigationTuning.getLogTypes().contains(check.type().name()) && check.violationLevel() < mitigationTuning.getMinVl())
             return;
         String clientVersion = user.clientVersion().name();
@@ -213,7 +212,7 @@ public class Logs {
     }
 
     public void logDetection(User user, Check check, String details) {
-        if (!store.isDetection()) return;
+        if (!store.isDetection() || !isConnected()) return;
         String clientVersion = user.clientVersion().name();
         String brand = user.clientVersion().brand();
         if (clientVersion.length() > 20) {
@@ -241,7 +240,7 @@ public class Logs {
     }
 
     public void logCloudDetection(User user, CloudCheckType checkType, String details) {
-        if (!store.isCloudDetection()) return;
+        if (!store.isCloudDetection() || !isConnected()) return;
         String clientVersion = user.clientVersion().name();
         String brand = user.clientVersion().brand();
         if (clientVersion.length() > 20) {
@@ -267,7 +266,7 @@ public class Logs {
     }
 
     public void logPunishment(User user, PunishmentType type, String reason) {
-        if (!store.isPunishment()) return;
+        if (!store.isPunishment() || connectionPool == null || connectionPool.isClosed()) return;
         try (Connection connection = connectionPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO polar_logs_" + context + " (type, player_name, player_uuid, punishment_type, punishment_reason) VALUES (?, ?, ?, ?, ?)")) {
             preparedStatement.setString(1, "punishment");

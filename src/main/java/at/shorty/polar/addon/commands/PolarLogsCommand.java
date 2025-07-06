@@ -115,7 +115,7 @@ public class PolarLogsCommand extends Command {
                 commandSender.sendMessage("§cYou do not have permission to execute this command!");
                 return true;
             }
-            if (!polarLogs.getLogs().isConnected()) {
+            if (!polarLogs.getLogs().isConnected() && !args[0].equalsIgnoreCase("webhooks")) {
                 commandSender.sendMessage("§cDatabase connection not established!");
                 return true;
             }
@@ -305,7 +305,12 @@ public class PolarLogsCommand extends Command {
         int entriesPerPage = 10;
         try {
             int offset = (page - 1) * entriesPerPage;
-            int totalCount = polarLogs.getLogs().getLogCountData(context, name, timeRange).getTotalCount();
+            LogCountData logCountData = polarLogs.getLogs().getLogCountData(context, name, timeRange);
+            if (logCountData == null) {
+                sender.sendMessage("§cPlayer not found in logs or database connection not established!");
+                return;
+            }
+            int totalCount = logCountData.getTotalCount();
             if (totalCount == 0) {
                 sender.sendMessage("§cNo logs available.");
                 return;
@@ -434,7 +439,7 @@ public class PolarLogsCommand extends Command {
             }
             LogCountData logCountData = polarLogs.getLogs().getLogCountData(context, name, timeRange);
             if (logCountData == null) {
-                sender.sendMessage("§cPlayer not found in logs!");
+                sender.sendMessage("§cPlayer not found in logs or database connection not established!");
                 return;
             }
             sender.sendMessage("§bPolar Logs §8- §7Addon by §cShorty");
