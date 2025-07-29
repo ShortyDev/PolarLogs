@@ -183,8 +183,11 @@ public class Logs {
 
     public void logMitigation(User user, Check check, String details) {
         if (!store.isMitigation() || !isConnected()) return;
-        if (mitigationTuning.getLogTypes().contains(check.type().name()) && check.violationLevel() < mitigationTuning.getMinVl())
+        if (!mitigationTuning.getLogTypes().contains(check.type().name()))
             return;
+        if (check.violationLevel() < mitigationTuning.getMinVl()) {
+            return;
+        }
         String clientVersion = user.clientVersion().name();
         String brand = user.clientVersion().brand();
         if (clientVersion.length() > 20) {
@@ -215,6 +218,9 @@ public class Logs {
         if (!store.isDetection() || !isConnected()) return;
         if (!detectionTuning.getLogTypes().contains(check.type().name()))
             return;
+        if (check.violationLevel() < detectionTuning.getMinVl()) {
+            return;
+        }
         String clientVersion = user.clientVersion().name();
         String brand = user.clientVersion().brand();
         if (clientVersion.length() > 20) {
