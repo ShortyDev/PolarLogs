@@ -42,6 +42,7 @@ logs:
       - 'TICK_SPEED'
       - 'REACH'
       - 'BLOCK_INTERACT'
+      - 'OCCLUDED_INTERACT'
       - 'PHASE'
       - 'CLOUD'
     min_vl: 5 # Minimum VL to store a mitigation log
@@ -49,12 +50,41 @@ logs:
   detection:
     message: '&7%PLAYER_NAME% %PLAYER_CLIENT_VERSION_NAME% (%PLAYER_CLIENT_BRAND%) (%PLAYER_LATENCY%ms) &8- &c%VL% VL &b%CHECK_TYPE%'
     hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%\n\n&r%DETAILS%'
+    log_types:
+      - 'MOVEMENT'
+      - 'VELOCITY'
+      - 'GROUND_SPOOF'
+      - 'LATENCY_ABUSE'
+      - 'TICK_SPEED'
+      - 'REACH'
+      - 'BLOCK_INTERACT'
+      - 'OCCLUDED_INTERACT'
+      - 'PHASE'
+      - 'CLOUD'
   cloud_detection:
     message: '&7%PLAYER_NAME% %PLAYER_CLIENT_VERSION_NAME% (%PLAYER_CLIENT_BRAND%) (%PLAYER_LATENCY%ms) &8- &b%CHECK_TYPE%'
     hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%\n\n&r%DETAILS%'
+    log_types:
+      - 'AUTO_CLICKER'
+      - 'CHEST_STEALER'
+      - 'COMBAT_BEHAVIOR'
+      - 'INVALID_PROTOCOL'
+      - 'SCAFFOLD'
+      - 'CPS_LIMIT'
+      - 'RIGHT_CPS_LIMIT'
+      - 'LATENCY_ABUSE'
   punishment:
     message: '&7%PLAYER_NAME% &8- &c%PUNISHMENT% &7for &b%REASON%'
     hover_text: '&b%TIMESTAMP% &8- &b%PLAYER_NAME%\n&7&o%PLAYER_UUID%'
+    log_types:
+      - 'AUTO_CLICKER'
+      - 'CHEST_STEALER'
+      - 'COMBAT_BEHAVIOR'
+      - 'INVALID_PROTOCOL'
+      - 'SCAFFOLD'
+      - 'CPS_LIMIT'
+      - 'RIGHT_CPS_LIMIT'
+      - 'LATENCY_ABUSE'
 # -------------------
 # Discord Webhooks
 # -------------------

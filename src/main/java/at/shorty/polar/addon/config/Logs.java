@@ -29,7 +29,7 @@ public class Logs {
     public transient String context;
     public transient LogStore store;
     public transient String timestampFormat;
-    public transient MitigationTuning mitigationTuning;
+    public transient Tuning mitigationTuning, detectionTuning, cloudTuning, punishmentTuning;
     public transient String mitigationMessage, mitigationHoverText, detectionMessage, detectionHoverText, cloudDetectionMessage, cloudDetectionHoverText, punishmentMessage, punishmentHoverText;
     @Setter
     private HikariDataSource connectionPool;
@@ -213,6 +213,8 @@ public class Logs {
 
     public void logDetection(User user, Check check, String details) {
         if (!store.isDetection() || !isConnected()) return;
+        if (!detectionTuning.getLogTypes().contains(check.type().name()))
+            return;
         String clientVersion = user.clientVersion().name();
         String brand = user.clientVersion().brand();
         if (clientVersion.length() > 20) {
@@ -241,6 +243,8 @@ public class Logs {
 
     public void logCloudDetection(User user, CloudCheckType checkType, String details) {
         if (!store.isCloudDetection() || !isConnected()) return;
+        if (!cloudTuning.getLogTypes().contains(checkType.name()))
+            return;
         String clientVersion = user.clientVersion().name();
         String brand = user.clientVersion().brand();
         if (clientVersion.length() > 20) {
@@ -265,8 +269,11 @@ public class Logs {
         }
     }
 
-    public void logPunishment(User user, PunishmentType type, String reason) {
+    public void logPunishment(User user, PunishmentType type, Set<CloudCheckType> checks, String reason) {
         if (!store.isPunishment() || connectionPool == null || connectionPool.isClosed()) return;
+        if (checks.stream().noneMatch(checkType -> punishmentTuning.getLogTypes().contains(checkType.name()))) {
+            return;
+        }
         try (Connection connection = connectionPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO polar_logs_" + context + " (type, player_name, player_uuid, punishment_type, punishment_reason) VALUES (?, ?, ?, ?, ?)")) {
             preparedStatement.setString(1, "punishment");
@@ -288,13 +295,16 @@ public class Logs {
         logs.setContext(section.getString("context"));
         logs.setStore(LogStore.loadFromConfigSection(section.getConfigurationSection("store")));
         logs.setTimestampFormat(section.getString("timestamp_format"));
-        logs.setMitigationTuning(MitigationTuning.loadFromConfigSection(section.getConfigurationSection("mitigation")));
+        logs.setMitigationTuning(Tuning.loadFromConfigSection(section.getConfigurationSection("mitigation")));
         logs.setMitigationMessage(section.getConfigurationSection("mitigation").getString("message"));
         logs.setMitigationHoverText(section.getConfigurationSection("mitigation").getString("hover_text"));
+        logs.setDetectionTuning(Tuning.loadFromConfigSection(section.getConfigurationSection("detection")));
         logs.setDetectionMessage(section.getConfigurationSection("detection").getString("message"));
         logs.setDetectionHoverText(section.getConfigurationSection("detection").getString("hover_text"));
+        logs.setCloudTuning(Tuning.loadFromConfigSection(section.getConfigurationSection("cloud_detection")));
         logs.setCloudDetectionMessage(section.getConfigurationSection("cloud_detection").getString("message"));
         logs.setCloudDetectionHoverText(section.getConfigurationSection("cloud_detection").getString("hover_text"));
+        logs.setPunishmentTuning(Tuning.loadFromConfigSection(section.getConfigurationSection("punishment")));
         logs.setPunishmentMessage(section.getConfigurationSection("punishment").getString("message"));
         logs.setPunishmentHoverText(section.getConfigurationSection("punishment").getString("hover_text"));
         return logs;
@@ -387,16 +397,16 @@ public class Logs {
     }
 
     @Data
-    public static class MitigationTuning {
+    public static class Tuning {
 
         public transient List<String> logTypes;
         public transient int minVl;
 
-        public static MitigationTuning loadFromConfigSection(ConfigurationSection section) {
-            MitigationTuning mitigationTuning = new MitigationTuning();
-            mitigationTuning.setLogTypes(section.getStringList("log_types"));
-            mitigationTuning.setMinVl(section.getInt("min_vl"));
-            return mitigationTuning;
+        public static Tuning loadFromConfigSection(ConfigurationSection section) {
+            Tuning tuning = new Tuning();
+            tuning.setLogTypes(section.getStringList("log_types"));
+            tuning.setMinVl(section.getInt("min_vl", 0));
+            return tuning;
         }
     }
 }
