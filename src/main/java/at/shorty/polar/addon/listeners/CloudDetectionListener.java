@@ -34,7 +34,7 @@ public class CloudDetectionListener extends DefaultCooldown implements Consumer<
         if (cloudDetection.isEnabled() && cloudDetection.isNotificationEnabled(cloudDetectionEvent.check().type())) {
             if (cloudDetection.getCooldownPerPlayerAndType() > 0 && cloudDetection.handleCooldown(cloudDetectionEvent, Type.WEBHOOK)) return;
             String content = WebhookComposer.composeCloudDetectionWebhookMessage(cloudDetection, cloudDetectionEvent);
-            content = WebhookComposer.replaceGlobalPlaceholders(content, cloudDetectionEvent.user());
+            content = WebhookComposer.replaceGlobalPlaceholders(content, cloudDetectionEvent.user(), logs);
             DiscordWebhook.sendWebhook(cloudDetection.getWebhookUrl(), content);
         }
         if (logs.isEnabled() && logs.getStore().isCloudDetection()) {

@@ -35,7 +35,7 @@ public class PunishmentListener extends DefaultCooldown implements Consumer<Puni
         if (punishment.isEnabled() && String.join("", punishment.getTypesEnabled()).contains(punishmentEvent.type().name())) {
             if (punishment.getCooldownPerPlayer() > 0 && handleCooldown(punishmentEvent, DefaultCooldown.Type.WEBHOOK)) return;
             String content = WebhookComposer.composePunishmentWebhookMessage(punishment, punishmentEvent);
-            content = WebhookComposer.replaceGlobalPlaceholders(content, punishmentEvent.user());
+            content = WebhookComposer.replaceGlobalPlaceholders(content, punishmentEvent.user(), logs);
             DiscordWebhook.sendWebhook(punishment.getWebhookUrl(), content);
         }
         if (logs.isEnabled() && logs.getStore().isPunishment()) {

@@ -34,7 +34,7 @@ public class DetectionListener extends DefaultCooldown implements Consumer<Detec
         if (detection.isEnabled() && detection.isNotificationEnabled(detectionAlertEvent.check().type())) {
             if (detection.getCooldownPerPlayerAndType() > 0 && detection.handleCooldown(detectionAlertEvent, Type.WEBHOOK)) return;
             String content = WebhookComposer.composeDetectionWebhookMessage(detection, detectionAlertEvent);
-            content = WebhookComposer.replaceGlobalPlaceholders(content, detectionAlertEvent.user());
+            content = WebhookComposer.replaceGlobalPlaceholders(content, detectionAlertEvent.user(), logs);
             DiscordWebhook.sendWebhook(detection.getWebhookUrl(), content);
         }
         if (logs.isEnabled() && logs.getStore().isDetection()) {

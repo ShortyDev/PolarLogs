@@ -1,9 +1,7 @@
 package at.shorty.polar.addon.hook;
 
-import at.shorty.polar.addon.config.CloudDetection;
-import at.shorty.polar.addon.config.Detection;
-import at.shorty.polar.addon.config.Mitigation;
-import at.shorty.polar.addon.config.Punishment;
+import at.shorty.polar.addon.PolarLogs;
+import at.shorty.polar.addon.config.*;
 import at.shorty.polar.addon.util.Json;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
@@ -64,9 +62,10 @@ public class WebhookComposer {
                 .replace("%REASON%", event.reason());
     }
 
-    public String replaceGlobalPlaceholders(String content, User user) {
+    public String replaceGlobalPlaceholders(String content, User user, Logs logs) {
         Player bukkitPlayer = user.bukkitPlayer().orElse(null);
         return content.replace("%PLAYER_NAME%", user.username())
+                .replace("%CONTEXT%", logs.getContext())
                 .replace("%PLAYER_UUID%", user.uuid().toString())
                 .replace("%PLAYER_LATENCY%", String.valueOf(user.connection().latency()))
                 .replace("%PLAYER_IP%", bukkitPlayer != null ? bukkitPlayer.getAddress().getAddress().getHostAddress() : "Unknown")

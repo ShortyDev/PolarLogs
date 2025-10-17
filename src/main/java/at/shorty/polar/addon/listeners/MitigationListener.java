@@ -34,7 +34,7 @@ public class MitigationListener extends DefaultCooldown implements Consumer<Miti
         if (mitigation.isEnabled() && mitigation.isNotificationEnabled(mitigationEvent.check().type()) && mitigationEvent.check().violationLevel() >= mitigation.getMinVl()) {
             if (mitigation.getCooldownPerPlayerAndType() > 0 && handleCooldown(mitigationEvent, Type.WEBHOOK)) return;
             String content = WebhookComposer.composeMitigationWebhookMessage(mitigation, mitigationEvent);
-            content = WebhookComposer.replaceGlobalPlaceholders(content, mitigationEvent.user());
+            content = WebhookComposer.replaceGlobalPlaceholders(content, mitigationEvent.user(), logs);
             DiscordWebhook.sendWebhook(mitigation.getWebhookUrl(), content);
         }
         if (logs.isEnabled() && logs.getStore().isMitigation() && mitigationEvent.check().violationLevel() >= logs.getMitigationTuning().getMinVl()) {
