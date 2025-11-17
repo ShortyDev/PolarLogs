@@ -6,17 +6,11 @@ import lombok.Getter;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.annotation.dependency.Dependency;
-import org.bukkit.plugin.java.annotation.plugin.Plugin;
-import org.bukkit.plugin.java.annotation.plugin.author.Author;
 import top.polar.api.loader.LoaderApi;
 
 import java.lang.reflect.Field;
 import java.util.Set;
 
-@Plugin(name = "PolarLogs", version = "2.6.4")
-@Author("ShortyDev")
-@Dependency("PolarLoader")
 public class PolarLogs extends JavaPlugin {
 
     private PolarApiHook polarApiHook;
