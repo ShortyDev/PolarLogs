@@ -6,7 +6,6 @@ import at.shorty.polar.addon.config.Mitigation;
 import at.shorty.polar.addon.hook.DiscordWebhook;
 import at.shorty.polar.addon.hook.WebhookComposer;
 import at.shorty.polar.addon.ratelimit.DefaultCooldown;
-import org.bukkit.Bukkit;
 import top.polar.api.user.event.MitigationEvent;
 
 import java.util.concurrent.TimeUnit;
@@ -39,8 +38,8 @@ public class MitigationListener extends DefaultCooldown implements Consumer<Miti
         }
         if (logs.isEnabled() && logs.getStore().isMitigation() && mitigationEvent.check().violationLevel() >= logs.getMitigationTuning().getMinVl()) {
             if (mitigation.getCooldownPerPlayerAndType() > 0 && handleCooldown(mitigationEvent, Type.LOGS)) return;
-            Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class),
-                    () -> logs.logMitigation(mitigationEvent.user(), mitigationEvent.check(), mitigationEvent.details()));
+            PolarLogs.getSpecialUtilityJustForFoliaSpecialNeeds().runAsyncNow(() ->
+                    logs.logMitigation(mitigationEvent.user(), mitigationEvent.check(), mitigationEvent.details()));
         }
     }
 }

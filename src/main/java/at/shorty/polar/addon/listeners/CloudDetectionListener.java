@@ -6,7 +6,6 @@ import at.shorty.polar.addon.config.Logs;
 import at.shorty.polar.addon.hook.DiscordWebhook;
 import at.shorty.polar.addon.hook.WebhookComposer;
 import at.shorty.polar.addon.ratelimit.DefaultCooldown;
-import org.bukkit.Bukkit;
 import top.polar.api.user.event.CloudDetectionEvent;
 
 import java.util.concurrent.TimeUnit;
@@ -39,8 +38,8 @@ public class CloudDetectionListener extends DefaultCooldown implements Consumer<
         }
         if (logs.isEnabled() && logs.getStore().isCloudDetection()) {
             if (cloudDetection.getCooldownPerPlayerAndType() > 0 && cloudDetection.handleCooldown(cloudDetectionEvent, Type.LOGS)) return;
-            Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class),
-                    () -> logs.logCloudDetection(cloudDetectionEvent.user(), cloudDetectionEvent.check().type(), String.join(", ", cloudDetectionEvent.check().tags())));
+            PolarLogs.getSpecialUtilityJustForFoliaSpecialNeeds().runAsyncNow(() ->
+                    logs.logCloudDetection(cloudDetectionEvent.user(), cloudDetectionEvent.check().type(), String.join(", ", cloudDetectionEvent.check().tags())));
         }
     }
 }

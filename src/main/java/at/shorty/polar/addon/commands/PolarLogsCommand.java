@@ -263,7 +263,7 @@ public class PolarLogsCommand extends Command {
     private void exportPlayerLogs(CommandSender sender, String context, String name, TimeRange timeRange, boolean includeDetails) {
         long exportTime = System.currentTimeMillis();
         String humanExportTime = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date(exportTime));
-        Bukkit.getServer().getScheduler().runTaskAsynchronously(polarLogs, () -> {
+        PolarLogs.getSpecialUtilityJustForFoliaSpecialNeeds().runAsyncNow(() -> {
             try {
                 sender.sendMessage(PolarLogs.prefix + "§7Exporting logs... (async)");
                 sender.sendMessage(PolarLogs.prefix + "§7Hard limit: 1000 entries");
@@ -302,173 +302,178 @@ public class PolarLogsCommand extends Command {
     }
 
     public void sendPlayerLogs(CommandSender sender, String context, String name, TimeRange timeRange, int page, String[] args) {
-        int entriesPerPage = 10;
-        try {
-            int offset = (page - 1) * entriesPerPage;
-            LogCountData logCountData = polarLogs.getLogs().getLogCountData(context, name, timeRange);
-            if (logCountData == null) {
-                sender.sendMessage("§cPlayer not found in logs or database connection not established!");
-                return;
-            }
-            int totalCount = logCountData.getTotalCount();
-            if (totalCount == 0) {
-                sender.sendMessage("§cNo logs available.");
-                return;
-            }
-            int maxPage = (int) Math.ceil((double) totalCount / entriesPerPage);
-            if (page > maxPage) {
-                sender.sendMessage("§cInvalid page number! (max: " + maxPage + ")");
-                return;
-            }
-            List<LogEntry> logEntries = polarLogs.getLogs().getLogEntries(context, name, entriesPerPage, offset, timeRange);
-            if (name != null) {
-                sender.sendMessage("§7Player logs §b" + name + "§7@§b" + context + "§7:");
-            } else {
-                sender.sendMessage("§7Context logs §b" + context + "§7:");
-            }
-            if (timeRange != null)
-                sender.sendMessage("§7Time range: §b" + timeRange.formatStart(polarLogs.getLogs().getTimestampFormat()) + " - " + timeRange.formatEnd(polarLogs.getLogs().getTimestampFormat()));
-            Logs logs = polarLogs.getLogs();
-            for (LogEntry logEntry : logEntries) {
-                String messageTemplate;
-                String hoverTemplate;
-                switch (logEntry.type) {
-                    case "mitigation":
-                        messageTemplate = "§eM§r " + logs.getMitigationMessage();
-                        hoverTemplate = logs.getMitigationHoverText();
-                        break;
-                    case "detection":
-                        messageTemplate = "§cD§r " + logs.getDetectionMessage();
-                        hoverTemplate = logs.getDetectionHoverText();
-                        break;
-                    case "cloud_detection":
-                        messageTemplate = "§cCD§r " + logs.getCloudDetectionMessage();
-                        hoverTemplate = logs.getCloudDetectionHoverText();
-                        break;
-                    case "punishment":
-                        messageTemplate = "§4P§r " + logs.getPunishmentMessage();
-                        hoverTemplate = logs.getPunishmentHoverText();
-                        break;
-                    default:
-                        messageTemplate = "§cUnknown log type!";
-                        hoverTemplate = "§cUnknown log type!";
-                        break;
+        PolarLogs.getSpecialUtilityJustForFoliaSpecialNeeds().runAsyncNow(() -> {
+           int entriesPerPage = 10;
+            try {
+                int offset = (page - 1) * entriesPerPage;
+                LogCountData logCountData = polarLogs.getLogs().getLogCountData(context, name, timeRange);
+                if (logCountData == null) {
+                    sender.sendMessage("§cPlayer not found in logs or database connection not established!");
+                    return;
                 }
-                String logEntryDetails = logEntry.details.replaceAll("<.*>", "");
-                String message = messageTemplate
-                        .replace("%PLAYER_NAME%", logEntry.playerName)
-                        .replace("%PLAYER_UUID%", logEntry.playerUuid)
-                        .replace("%PLAYER_LATENCY%", String.valueOf(logEntry.playerLatency))
-                        .replace("%PLAYER_CLIENT_VERSION_NAME%", logEntry.getPlayerVersion())
-                        .replace("%PLAYER_CLIENT_BRAND%", logEntry.getPlayerBrand())
-                        .replace("%TIMESTAMP%", new SimpleDateFormat(logs.getTimestampFormat()).format(new Date(logEntry.time)))
-                        .replace("%VL%", String.valueOf(logEntry.vl))
-                        .replace("%CHECK_TYPE%", logEntry.checkType)
-                        .replace("%CHECK_NAME%", logEntry.checkName)
-                        .replace("%DETAILS%", logEntryDetails)
-                        .replace("%PUNISHMENT%", logEntry.punishmentType)
-                        .replace("%REASON%", logEntry.punishmentReason);
-                String hoverText = hoverTemplate
-                        .replace("%PLAYER_NAME%", logEntry.playerName)
-                        .replace("%PLAYER_UUID%", logEntry.playerUuid)
-                        .replace("%PLAYER_LATENCY%", String.valueOf(logEntry.playerLatency))
-                        .replace("%PLAYER_CLIENT_VERSION_NAME%", logEntry.getPlayerVersion())
-                        .replace("%PLAYER_CLIENT_BRAND%", logEntry.getPlayerBrand())
-                        .replace("%TIMESTAMP%", new SimpleDateFormat(logs.getTimestampFormat()).format(new Date(logEntry.time)))
-                        .replace("%VL%", String.valueOf(logEntry.vl))
-                        .replace("%CHECK_TYPE%", logEntry.checkType)
-                        .replace("%CHECK_NAME%", logEntry.checkName)
-                        .replace("%DETAILS%", logEntryDetails)
-                        .replace("%PUNISHMENT%", logEntry.punishmentType)
-                        .replace("%REASON%", logEntry.punishmentReason);
-                message = ChatColor.translateAlternateColorCodes('&', message);
-                hoverText = ChatColor.translateAlternateColorCodes('&', hoverText);
-                TextComponent textComponent = new TextComponent(message);
-                textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentSerializer.parse("{'text': '" + hoverText + "'}")));
+                int totalCount = logCountData.getTotalCount();
+                if (totalCount == 0) {
+                    sender.sendMessage("§cNo logs available.");
+                    return;
+                }
+                int maxPage = (int) Math.ceil((double) totalCount / entriesPerPage);
+                if (page > maxPage) {
+                    sender.sendMessage("§cInvalid page number! (max: " + maxPage + ")");
+                    return;
+                }
+                List<LogEntry> logEntries = polarLogs.getLogs().getLogEntries(context, name, entriesPerPage, offset, timeRange);
+                if (name != null) {
+                    sender.sendMessage("§7Player logs §b" + name + "§7@§b" + context + "§7:");
+                } else {
+                    sender.sendMessage("§7Context logs §b" + context + "§7:");
+                }
+                if (timeRange != null)
+                    sender.sendMessage("§7Time range: §b" + timeRange.formatStart(polarLogs.getLogs().getTimestampFormat()) + " - " + timeRange.formatEnd(polarLogs.getLogs().getTimestampFormat()));
+                Logs logs = polarLogs.getLogs();
+                for (LogEntry logEntry : logEntries) {
+                    String messageTemplate;
+                    String hoverTemplate;
+                    switch (logEntry.type) {
+                        case "mitigation":
+                            messageTemplate = "§eM§r " + logs.getMitigationMessage();
+                            hoverTemplate = logs.getMitigationHoverText();
+                            break;
+                        case "detection":
+                            messageTemplate = "§cD§r " + logs.getDetectionMessage();
+                            hoverTemplate = logs.getDetectionHoverText();
+                            break;
+                        case "cloud_detection":
+                            messageTemplate = "§cCD§r " + logs.getCloudDetectionMessage();
+                            hoverTemplate = logs.getCloudDetectionHoverText();
+                            break;
+                        case "punishment":
+                            messageTemplate = "§4P§r " + logs.getPunishmentMessage();
+                            hoverTemplate = logs.getPunishmentHoverText();
+                            break;
+                        default:
+                            messageTemplate = "§cUnknown log type!";
+                            hoverTemplate = "§cUnknown log type!";
+                            break;
+                    }
+                    String logEntryDetails = logEntry.details.replaceAll("<.*>", "");
+                    String message = messageTemplate
+                            .replace("%PLAYER_NAME%", logEntry.playerName)
+                            .replace("%PLAYER_UUID%", logEntry.playerUuid)
+                            .replace("%PLAYER_LATENCY%", String.valueOf(logEntry.playerLatency))
+                            .replace("%PLAYER_CLIENT_VERSION_NAME%", logEntry.getPlayerVersion())
+                            .replace("%PLAYER_CLIENT_BRAND%", logEntry.getPlayerBrand())
+                            .replace("%TIMESTAMP%", new SimpleDateFormat(logs.getTimestampFormat()).format(new Date(logEntry.time)))
+                            .replace("%VL%", String.valueOf(logEntry.vl))
+                            .replace("%CHECK_TYPE%", logEntry.checkType)
+                            .replace("%CHECK_NAME%", logEntry.checkName)
+                            .replace("%DETAILS%", logEntryDetails)
+                            .replace("%PUNISHMENT%", logEntry.punishmentType)
+                            .replace("%REASON%", logEntry.punishmentReason);
+                    String hoverText = hoverTemplate
+                            .replace("%PLAYER_NAME%", logEntry.playerName)
+                            .replace("%PLAYER_UUID%", logEntry.playerUuid)
+                            .replace("%PLAYER_LATENCY%", String.valueOf(logEntry.playerLatency))
+                            .replace("%PLAYER_CLIENT_VERSION_NAME%", logEntry.getPlayerVersion())
+                            .replace("%PLAYER_CLIENT_BRAND%", logEntry.getPlayerBrand())
+                            .replace("%TIMESTAMP%", new SimpleDateFormat(logs.getTimestampFormat()).format(new Date(logEntry.time)))
+                            .replace("%VL%", String.valueOf(logEntry.vl))
+                            .replace("%CHECK_TYPE%", logEntry.checkType)
+                            .replace("%CHECK_NAME%", logEntry.checkName)
+                            .replace("%DETAILS%", logEntryDetails)
+                            .replace("%PUNISHMENT%", logEntry.punishmentType)
+                            .replace("%REASON%", logEntry.punishmentReason);
+                    message = ChatColor.translateAlternateColorCodes('&', message);
+                    hoverText = ChatColor.translateAlternateColorCodes('&', hoverText);
+                    TextComponent textComponent = new TextComponent(message);
+                    textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentSerializer.parse("{'text': '" + hoverText + "'}")));
+                    if (sender instanceof Player) {
+                        Player player = (Player) sender;
+                        player.spigot().sendMessage(textComponent);
+                    } else {
+                        sender.sendMessage(textComponent.toLegacyText());
+                    }
+                }
+                TextComponent pageComponent = new TextComponent("§7Page §b" + page + "§7/§b" + maxPage);
+                if (page > 1) {
+                    TextComponent previousComponent = new TextComponent(" §7[§b«§7] ");
+                    previousComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command + " view " + args[1] + " " + (page - 1)));
+                    pageComponent.addExtra(previousComponent);
+                } else {
+                    pageComponent.addExtra(" §7[§c«§7] ");
+                }
+                if (page < maxPage) {
+                    TextComponent nextComponent = new TextComponent(" §7[§b»§7] ");
+                    nextComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command + " view " + args[1] + " " + (page + 1)));
+                    pageComponent.addExtra(nextComponent);
+                } else {
+                    pageComponent.addExtra(" §7[§c»§7] ");
+                }
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
-                    player.spigot().sendMessage(textComponent);
+                    player.spigot().sendMessage(pageComponent);
                 } else {
-                    sender.sendMessage(textComponent.toLegacyText());
+                    sender.sendMessage(pageComponent.toLegacyText());
                 }
+                sender.sendMessage("§7Total entries: §b" + totalCount + " §7- Displaying §b" + logEntries.size() + "§7 entries");
+            } catch (SQLException e) {
+                sender.sendMessage("§cContext not found");
             }
-            TextComponent pageComponent = new TextComponent("§7Page §b" + page + "§7/§b" + maxPage);
-            if (page > 1) {
-                TextComponent previousComponent = new TextComponent(" §7[§b«§7] ");
-                previousComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command + " view " + args[1] + " " + (page - 1)));
-                pageComponent.addExtra(previousComponent);
-            } else {
-                pageComponent.addExtra(" §7[§c«§7] ");
-            }
-            if (page < maxPage) {
-                TextComponent nextComponent = new TextComponent(" §7[§b»§7] ");
-                nextComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command + " view " + args[1] + " " + (page + 1)));
-                pageComponent.addExtra(nextComponent);
-            } else {
-                pageComponent.addExtra(" §7[§c»§7] ");
-            }
-            if (sender instanceof Player) {
-                Player player = (Player) sender;
-                player.spigot().sendMessage(pageComponent);
-            } else {
-                sender.sendMessage(pageComponent.toLegacyText());
-            }
-            sender.sendMessage("§7Total entries: §b" + totalCount + " §7- Displaying §b" + logEntries.size() + "§7 entries");
-        } catch (SQLException e) {
-            sender.sendMessage("§cContext not found");
-        }
+        });
     }
 
     public void sendPlayerInfo(CommandSender sender, String context, String name) {
-        try {
-            TimeRange timeRange = null;
-            if (name.contains(":")) {
-                String[] split = name.split(":");
-                if (split.length != 2) {
-                    sender.sendMessage("§cInvalid time range! See \"trange\" subcommand for valid inputs.");
+        PolarLogs.getSpecialUtilityJustForFoliaSpecialNeeds().runAsyncNow(() -> {
+            String name2 = name;
+            try {
+                TimeRange timeRange = null;
+                if (name2.contains(":")) {
+                    String[] split = name2.split(":");
+                    if (split.length != 2) {
+                        sender.sendMessage("§cInvalid time range! See \"trange\" subcommand for valid inputs.");
+                        return;
+                    }
+                    name2 = split[0];
+                    String trange = split[1];
+                    try {
+                        timeRange = TimeRange.parseFromString(trange);
+                    } catch (IllegalArgumentException e) {
+                        sender.sendMessage("§cInvalid time range! See \"trange\" subcommand for valid inputs.");
+                        return;
+                    }
+                }
+                LogCountData logCountData = polarLogs.getLogs().getLogCountData(context, name2, timeRange);
+                if (logCountData == null) {
+                    sender.sendMessage("§cPlayer not found in logs or database connection not established!");
                     return;
                 }
-                name = split[0];
-                String trange = split[1];
-                try {
-                    timeRange = TimeRange.parseFromString(trange);
-                } catch (IllegalArgumentException e) {
-                    sender.sendMessage("§cInvalid time range! See \"trange\" subcommand for valid inputs.");
-                    return;
+                sender.sendMessage("§bPolar Logs §8- §7Addon by §cShorty");
+                if (timeRange != null)
+                    sender.sendMessage("§7Time range: §b" + timeRange.formatStart(polarLogs.getLogs().getTimestampFormat()) + " - " + timeRange.formatEnd(polarLogs.getLogs().getTimestampFormat()));
+                sender.sendMessage("§7Player info §b" + name2 + "§7@§b" + context + "§7:");
+                TextComponent mitigations = new TextComponent("§7- Mitigations: §bx" + logCountData.getMitigations().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isMitigation() ? "" : " §c§o(locally disabled)"));
+                mitigations.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(logCountData.getMitigations().entrySet().stream().map(entry -> "§7" + entry.getKey() + ": §bx" + entry.getValue()).collect(Collectors.joining("\n")))));
+                TextComponent detections = new TextComponent("§7- Detections: §bx" + logCountData.getDetections().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isDetection() ? "" : " §c§o(locally disabled)"));
+                detections.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(logCountData.getDetections().entrySet().stream().map(entry -> "§7" + entry.getKey() + ": §bx" + entry.getValue()).collect(Collectors.joining("\n")))));
+                TextComponent cloudDetections = new TextComponent("§7- Cloud Detections: §bx" + logCountData.getCloudDetections().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isCloudDetection() ? "" : " §c§o(locally disabled)"));
+                cloudDetections.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(logCountData.getCloudDetections().entrySet().stream().map(entry -> "§7" + entry.getKey() + ": §bx" + entry.getValue()).collect(Collectors.joining("\n")))));
+                TextComponent punishments = new TextComponent("§7- Punishments: §bx" + logCountData.getPunishments().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isPunishment() ? "" : " §c§o(locally disabled)"));
+                punishments.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(logCountData.getPunishments().entrySet().stream().map(entry -> "§7" + entry.getKey() + ": §bx" + entry.getValue()).collect(Collectors.joining("\n")))));
+                if (sender instanceof Player) {
+                    Player player = (Player) sender;
+                    player.spigot().sendMessage(mitigations);
+                    player.spigot().sendMessage(detections);
+                    player.spigot().sendMessage(cloudDetections);
+                    player.spigot().sendMessage(punishments);
+                } else {
+                    sender.sendMessage(mitigations.toLegacyText());
+                    sender.sendMessage(detections.toLegacyText());
+                    sender.sendMessage(cloudDetections.toLegacyText());
+                    sender.sendMessage(punishments.toLegacyText());
                 }
+            } catch (SQLException e) {
+                sender.sendMessage("§cContext not found");
             }
-            LogCountData logCountData = polarLogs.getLogs().getLogCountData(context, name, timeRange);
-            if (logCountData == null) {
-                sender.sendMessage("§cPlayer not found in logs or database connection not established!");
-                return;
-            }
-            sender.sendMessage("§bPolar Logs §8- §7Addon by §cShorty");
-            if (timeRange != null)
-                sender.sendMessage("§7Time range: §b" + timeRange.formatStart(polarLogs.getLogs().getTimestampFormat()) + " - " + timeRange.formatEnd(polarLogs.getLogs().getTimestampFormat()));
-            sender.sendMessage("§7Player info §b" + name + "§7@§b" + context + "§7:");
-            TextComponent mitigations = new TextComponent("§7- Mitigations: §bx" + logCountData.getMitigations().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isMitigation() ? "" : " §c§o(locally disabled)"));
-            mitigations.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(logCountData.getMitigations().entrySet().stream().map(entry -> "§7" + entry.getKey() + ": §bx" + entry.getValue()).collect(Collectors.joining("\n")))));
-            TextComponent detections = new TextComponent("§7- Detections: §bx" + logCountData.getDetections().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isDetection() ? "" : " §c§o(locally disabled)"));
-            detections.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(logCountData.getDetections().entrySet().stream().map(entry -> "§7" + entry.getKey() + ": §bx" + entry.getValue()).collect(Collectors.joining("\n")))));
-            TextComponent cloudDetections = new TextComponent("§7- Cloud Detections: §bx" + logCountData.getCloudDetections().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isCloudDetection() ? "" : " §c§o(locally disabled)"));
-            cloudDetections.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(logCountData.getCloudDetections().entrySet().stream().map(entry -> "§7" + entry.getKey() + ": §bx" + entry.getValue()).collect(Collectors.joining("\n")))));
-            TextComponent punishments = new TextComponent("§7- Punishments: §bx" + logCountData.getPunishments().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isPunishment() ? "" : " §c§o(locally disabled)"));
-            punishments.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(logCountData.getPunishments().entrySet().stream().map(entry -> "§7" + entry.getKey() + ": §bx" + entry.getValue()).collect(Collectors.joining("\n")))));
-            if (sender instanceof Player) {
-                Player player = (Player) sender;
-                player.spigot().sendMessage(mitigations);
-                player.spigot().sendMessage(detections);
-                player.spigot().sendMessage(cloudDetections);
-                player.spigot().sendMessage(punishments);
-            } else {
-                sender.sendMessage(mitigations.toLegacyText());
-                sender.sendMessage(detections.toLegacyText());
-                sender.sendMessage(cloudDetections.toLegacyText());
-                sender.sendMessage(punishments.toLegacyText());
-            }
-        } catch (SQLException e) {
-            sender.sendMessage("§cContext not found");
-        }
+        });
     }
 
     @Override

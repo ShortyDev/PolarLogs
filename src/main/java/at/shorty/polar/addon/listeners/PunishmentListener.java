@@ -6,8 +6,6 @@ import at.shorty.polar.addon.config.Punishment;
 import at.shorty.polar.addon.hook.DiscordWebhook;
 import at.shorty.polar.addon.hook.WebhookComposer;
 import at.shorty.polar.addon.ratelimit.DefaultCooldown;
-import lombok.AllArgsConstructor;
-import org.bukkit.Bukkit;
 import top.polar.api.user.event.PunishmentEvent;
 
 import java.util.concurrent.TimeUnit;
@@ -40,7 +38,7 @@ public class PunishmentListener extends DefaultCooldown implements Consumer<Puni
         }
         if (logs.isEnabled() && logs.getStore().isPunishment()) {
             if (punishment.getCooldownPerPlayer() > 0 && handleCooldown(punishmentEvent, Type.LOGS)) return;
-            Bukkit.getServer().getScheduler().runTaskAsynchronously(PolarLogs.getPlugin(PolarLogs.class), () ->
+            PolarLogs.getSpecialUtilityJustForFoliaSpecialNeeds().runAsyncNow(() ->
                     logs.logPunishment(punishmentEvent.user(), punishmentEvent.type(), punishmentEvent.cloudCheckTypes(), punishmentEvent.reason()));
         }
     }

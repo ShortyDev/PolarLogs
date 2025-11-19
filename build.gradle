@@ -34,6 +34,7 @@ dependencies {
     compileOnly("org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT")
     compileOnly("top.polar:api:2.2.0")
     implementation("com.zaxxer:HikariCP:6.3.0")
+    implementation("com.cjcrafter:foliascheduler:0.7.0")
     implementation("net.jodah:expiringmap:0.5.10")
     annotationProcessor("org.projectlombok:lombok:1.18.22")
 }

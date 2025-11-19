@@ -2,6 +2,7 @@ package at.shorty.polar.addon;
 
 import at.shorty.polar.addon.commands.PolarLogsCommand;
 import at.shorty.polar.addon.config.*;
+import at.shorty.polar.addon.util.SpecialUtilityJustForFoliaSpecialNeeds;
 import lombok.Getter;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -13,6 +14,8 @@ import java.util.Set;
 
 public class PolarLogs extends JavaPlugin {
 
+    @Getter
+    private static SpecialUtilityJustForFoliaSpecialNeeds specialUtilityJustForFoliaSpecialNeeds;
     private PolarApiHook polarApiHook;
     @Getter
     private Logs logs;
@@ -20,6 +23,7 @@ public class PolarLogs extends JavaPlugin {
 
     @Override
     public void onLoad() {
+        specialUtilityJustForFoliaSpecialNeeds = new SpecialUtilityJustForFoliaSpecialNeeds(this);
         updateConfig();
         Mitigation mitigation = Mitigation.loadFromConfigSection(getConfig().getConfigurationSection("mitigation"));
         Detection detection = Detection.loadFromConfigSection(getConfig().getConfigurationSection("detection"));
