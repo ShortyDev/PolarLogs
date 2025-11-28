@@ -12,15 +12,17 @@ If you have any suggestions, feel free to open an issue or a pull request.
 
 ## Command permissions
 
-| Command                                         | Description                     | Permission                    |
-|-------------------------------------------------|---------------------------------|-------------------------------|
-| /polarlogs                                      | Show help                       | polarlogs.command             |
-| /polarlogs reload                               | Reload the config               | polarlogs.command.reload      |
-| /polarlogs trange                               | See help page for time ranges   | polarlogs.command.logs        |
-| /polarlogs webhooks test                        | Test webhook                    | polarlogs.command.webhooks    |
-| /polarlogs info (player)                        | Show information about a player | polarlogs.command.info.player |
-| /polarlogs view ([query](#View-query)) (page)   | View logs (query desc. below)   | polarlogs.command.view        |
-| /polarlogs export ([query](#View-query)) (page) | Export logs (query desc. below) | polarlogs.command.export      |
+PolarLogs uses the Polar Subcommand API. This means that the logs command that interacts with this plugin is only available as a Polar subcommand.
+
+| Command                                          | Description                     | Permission                    |
+|--------------------------------------------------|---------------------------------|-------------------------------|
+| /polar logs                                      | Show help                       | polarlogs.command             |
+| /polar logs reload                               | Reload the config               | polarlogs.command.reload      |
+| /polar logs trange                               | See help page for time ranges   | polarlogs.command.logs        |
+| /polar  logs webhooks test                       | Test webhook                    | polarlogs.command.webhooks    |
+| /polar logs info (player)                        | Show information about a player | polarlogs.command.info.player |
+| /polar logs view ([query](#View-query)) (page)   | View logs (query desc. below)   | polarlogs.command.view        |
+| /polar logs export ([query](#View-query)) (page) | Export logs (query desc. below) | polarlogs.command.export      |
 
 In order for any subcommand to work, `polarlogs.command` needs to be set.
 
@@ -51,7 +53,7 @@ Extended permissions for exporting:
 
 The logs info and logs view commands allow narrowing down the time range by appending :value to the player name.
 
-Example command: `/polarlogs logs view Shorty:today global`
+Example command: `/polar logs logs view Shorty:today global`
 
 Available time selectors:
 
