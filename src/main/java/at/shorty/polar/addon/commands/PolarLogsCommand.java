@@ -529,7 +529,7 @@ public class PolarLogsCommand extends Subcommand {
 
     private boolean hasPermission(User user, String permission) {
         if (user == null) {
-            return false; // For now console can't use the command
+            return true;
         }
         return user.bukkitPlayer().map(player -> player.hasPermission(permission)).orElse(false);
     }
