@@ -1,4 +1,4 @@
-command: 'polarlogs' # Use 'disable' to disable the command
+command: 'logs' # Polar Subcommand. Use 'disable' to disable the command
 # -------------------
 # Log storage
 # -------------------

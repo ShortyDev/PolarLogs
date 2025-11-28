@@ -30,25 +30,12 @@ public class PolarLogs extends JavaPlugin {
         CloudDetection cloudDetection = CloudDetection.loadFromConfigSection(getConfig().getConfigurationSection("cloud_detection"));
         Punishment punishment = Punishment.loadFromConfigSection(getConfig().getConfigurationSection("punishment"));
         logs = Logs.loadFromConfigSection(getConfig().getConfigurationSection("logs"));
-        polarApiHook = new PolarApiHook(mitigation, detection, cloudDetection, punishment, logs);
+        polarApiHook = new PolarApiHook(this, mitigation, detection, cloudDetection, punishment, logs);
         LoaderApi.registerEnableCallback(polarApiHook);
     }
 
     @Override
     public void onEnable() {
-        YamlConfiguration config = (YamlConfiguration) getConfig();
-        String command = config.getString("command");
-        if (!command.equals("disable")) {
-            try {
-                Field bukkitCommandMap = getServer().getClass().getDeclaredField("commandMap");
-                bukkitCommandMap.setAccessible(true);
-                CommandMap commandMap = (CommandMap) bukkitCommandMap.get(getServer());
-                PolarLogsCommand polarLogsCommand = new PolarLogsCommand(this, command);
-                commandMap.register(command, polarLogsCommand);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                getLogger().severe("Failed to register command: " + e.getMessage());
-            }
-        }
         loadLogs();
     }
 

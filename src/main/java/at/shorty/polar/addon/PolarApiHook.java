@@ -1,5 +1,6 @@
 package at.shorty.polar.addon;
 
+import at.shorty.polar.addon.commands.PolarLogsCommand;
 import at.shorty.polar.addon.config.*;
 import at.shorty.polar.addon.listeners.CloudDetectionListener;
 import at.shorty.polar.addon.listeners.DetectionListener;
@@ -27,6 +28,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PolarApiHook implements Runnable {
 
+    private final PolarLogs polarLogs;
     private final Mitigation mitigation;
     private final Detection detection;
     private final CloudDetection cloudDetection;
@@ -49,6 +51,15 @@ public class PolarApiHook implements Runnable {
             polarApi.events().repository().registerListener(DetectionAlertEvent.class, detectionListener, ListenerPriority.RUN_LAST);
             polarApi.events().repository().registerListener(CloudDetectionEvent.class, cloudDetectionListener, ListenerPriority.RUN_LAST);
             polarApi.events().repository().registerListener(PunishmentEvent.class, punishmentListener, ListenerPriority.RUN_LAST);
+
+            String command = polarLogs.getConfig().getString("command");
+            if (!command.equals("disable")) {
+                if (command.equals("polarlogs")) {
+                    command = "logs";
+                }
+                PolarLogsCommand polarLogsCommand = new PolarLogsCommand(polarLogs, command);
+                polarApi.subcommands().registerSubcommand(polarLogsCommand, polarLogs);
+            }
         } catch (PolarNotLoadedException e) {
             throw new RuntimeException(e);
         }
@@ -91,6 +102,11 @@ public class PolarApiHook implements Runnable {
                     @Override
                     public UUID uuid() {
                         return UUID.randomUUID();
+                    }
+
+                    @Override
+                    public boolean exemptFromCloud() {
+                        return false;
                     }
 
                     @Override

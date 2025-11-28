@@ -12,9 +12,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import top.polar.api.command.Subcommand;
+import top.polar.api.user.User;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,59 +26,59 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class PolarLogsCommand extends Command {
+public class PolarLogsCommand extends Subcommand {
 
     private final PolarLogs polarLogs;
     private final String command;
 
     public PolarLogsCommand(PolarLogs polarLogs, String command) {
-        super(command, "Polar Logs Command", "/" + command, new ArrayList<>());
+        super(command, false, "polarlogs.command");
         this.polarLogs = polarLogs;
         this.command = command;
     }
 
     @Override
-    public boolean execute(CommandSender commandSender, String s, String[] args) {
-        if (!commandSender.hasPermission("polarlogs.command")) {
-            commandSender.sendMessage("§cYou do not have permission to execute this command!");
-            return true;
+    public void execute(User user, String s, String[] args) {
+        if (!hasPermission(user, "polarlogs.command")) {
+            sendMessage(user, "§cYou do not have permission to execute this command!");
+            return;
         }
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("reload")) {
-                if (!commandSender.hasPermission("polarlogs.command.reload")) {
-                    commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                    return true;
+                if (!hasPermission(user, "polarlogs.command.reload")) {
+                    sendMessage(user, "§cYou do not have permission to execute this command!");
+                    return;
                 }
-                commandSender.sendMessage("§7Reloading config...");
-                commandSender.sendMessage("§8Hint: Not respecting changes to the \"command\" config value! (Restart required)");
+                sendMessage(user, "§7Reloading config...");
+                sendMessage(user, "§8Hint: Not respecting changes to the \"command\" config value! (Restart required)");
                 polarLogs.reloadPluginConfig();
-                commandSender.sendMessage("§aConfig reloaded!");
-                return true;
+                sendMessage(user, "§aConfig reloaded!");
+                return;
             } else if (args[0].equalsIgnoreCase("trange")) {
-                if (!commandSender.hasPermission("polarlogs.command.view")) {
-                    commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                    return true;
+                if (!hasPermission(user, "polarlogs.command.view")) {
+                    sendMessage(user, "§cYou do not have permission to execute this command!");
+                    return;
                 }
                 if (!polarLogs.getLogs().isConnected()) {
-                    commandSender.sendMessage("§cDatabase connection not established!");
-                    return true;
+                    sendMessage(user, "§cDatabase connection not established!");
+                    return;
                 }
-                commandSender.sendMessage("§bPolar Logs §8- §7Addon by §cShorty");
-                commandSender.sendMessage("§7Time range valid inputs:");
-                commandSender.sendMessage("§7- §btoday §7- today");
-                commandSender.sendMessage("§7- §byesterday §7- yesterday");
-                commandSender.sendMessage("§7- §b1h §7- last 60 minutes");
-                commandSender.sendMessage("§7- §b1d §7- last 24 hours");
-                commandSender.sendMessage("§7- §b1w §7- last 7 days");
-                commandSender.sendMessage("§7- §b1m §7- last 30 days");
-                commandSender.sendMessage("§7- §byyyy-MM-dd §7- specific date");
-                commandSender.sendMessage("§7- §byyyy-mm-dd;yyyy-MM-dd §7- date range");
-                commandSender.sendMessage("§7- §byyyy-mm §7- specific month");
-                return true;
+                sendMessage(user, "§bPolar Logs §8- §7Addon by §cShorty");
+                sendMessage(user, "§7Time range valid inputs:");
+                sendMessage(user, "§7- §btoday §7- today");
+                sendMessage(user, "§7- §byesterday §7- yesterday");
+                sendMessage(user, "§7- §b1h §7- last 60 minutes");
+                sendMessage(user, "§7- §b1d §7- last 24 hours");
+                sendMessage(user, "§7- §b1w §7- last 7 days");
+                sendMessage(user, "§7- §b1m §7- last 30 days");
+                sendMessage(user, "§7- §byyyy-MM-dd §7- specific date");
+                sendMessage(user, "§7- §byyyy-mm-dd;yyyy-MM-dd §7- date range");
+                sendMessage(user, "§7- §byyyy-mm §7- specific month");
+                return;
             } else if (args[0].equalsIgnoreCase("view") || args[0].equalsIgnoreCase("export")) {
-                if (!commandSender.hasPermission("polarlogs.command." + args[0].toLowerCase())) {
-                    commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                    return true;
+                if (!hasPermission(user, "polarlogs.command." + args[0].toLowerCase())) {
+                    sendMessage(user, "§cYou do not have permission to execute this command!");
+                    return;
                 }
                 String helpMessage = PolarLogs.prefix + "§7v" + polarLogs.getDescription().getVersion() + " §8- §7Help\n" +
                         PolarLogs.prefix + "§7Server context: §b" + polarLogs.getLogs().getContext() + "\n" +
@@ -85,7 +86,7 @@ public class PolarLogsCommand extends Command {
                         PolarLogs.prefix + "§7Player query: §cp:<player>[@<context>][:<time range>]\n" +
                         PolarLogs.prefix + "§7Context query: §cc:<context>[:<time range>]\n" +
                         PolarLogs.prefix + "§7See \"trange\" subcommand for valid time range inputs.";
-                commandSender.sendMessage(helpMessage);
+                sendMessage(user, helpMessage);
                 TextComponent exampleComponent = new TextComponent(PolarLogs.prefix + "§7§oHover for example usage");
                 String text = "§7See log history of player §bShorty §7in default context\n" +
                         "§8/" + command + " view p:Shorty\n" +
@@ -100,90 +101,90 @@ public class PolarLogsCommand extends Command {
                             .replace("See", "Export")
                             .replace("view", "export");
                 exampleComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentSerializer.parse("{'text': '" + text + "'}")));
-                if (commandSender instanceof Player) {
-                    Player player = (Player) commandSender;
+                if (user instanceof Player) {
+                    Player player = (Player) user;
                     player.spigot().sendMessage(exampleComponent);
                 } else {
-                    commandSender.sendMessage(PolarLogs.prefix + "§7Example usage (Console format): \n"
+                    sendMessage(user, PolarLogs.prefix + "§7Example usage (Console format): \n"
                             + PolarLogs.prefix + text);
                 }
-                return true;
+                return;
             }
         }
         if (args.length >= 2) {
-            if (!commandSender.hasPermission("polarlogs.command.logs")) {
-                commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                return true;
+            if (!hasPermission(user, "polarlogs.command.logs")) {
+                sendMessage(user, "§cYou do not have permission to execute this command!");
+                return;
             }
             if (!polarLogs.getLogs().isConnected() && !args[0].equalsIgnoreCase("webhooks")) {
-                commandSender.sendMessage("§cDatabase connection not established!");
-                return true;
+                sendMessage(user, "§cDatabase connection not established!");
+                return;
             }
             if (args[0].equalsIgnoreCase("webhooks")) {
-                if (!commandSender.hasPermission("polarlogs.command.webhooks")) {
-                    commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                    return true;
+                if (!hasPermission(user, "polarlogs.command.webhooks")) {
+                    sendMessage(user, "§cYou do not have permission to execute this command!");
+                    return;
                 }
                 if (args[1].equalsIgnoreCase("test")) {
-                    commandSender.sendMessage("§7Testing webhook...");
+                    sendMessage(user, "§7Testing webhook...");
                     polarLogs.testWebhook();
-                    commandSender.sendMessage("§aWebhook sent!");
-                    return true;
+                    sendMessage(user, "§aWebhook sent!");
+                    return;
                 } else {
                     String helpMessage = PolarLogs.prefix + "§7v" + polarLogs.getDescription().getVersion() + " §8- §7Help\n" +
                             PolarLogs.prefix + "§7Available subcommands for §b" + args[0] + "§7:\n" +
                             PolarLogs.prefix + "§btest §7- Test the webhook";
-                    commandSender.sendMessage(helpMessage);
+                    sendMessage(user, helpMessage);
                 }
             } else if (args[0].equalsIgnoreCase("info")) {
-                if (!commandSender.hasPermission("polarlogs.command.info.player")) {
-                    commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                    return true;
+                if (!hasPermission(user, "polarlogs.command.info.player")) {
+                    sendMessage(user, "§cYou do not have permission to execute this command!");
+                    return;
                 }
                 String name = args[1];
                 if (!name.matches("^[a-zA-Z0-9_]{1,16}$")) {
-                    commandSender.sendMessage("§cInvalid player name, must be [a-zA-Z0-9_] length 1-16");
-                    return true;
+                    sendMessage(user, "§cInvalid player name, must be [a-zA-Z0-9_] length 1-16");
+                    return;
                 }
-                sendPlayerInfo(commandSender, polarLogs.getLogs().getContext(), name);
-                return true;
+                sendPlayerInfo(user, polarLogs.getLogs().getContext(), name);
+                return;
             } else if (args[0].equalsIgnoreCase("view")) {
-                if (!commandSender.hasPermission("polarlogs.command.view")) {
-                    commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                    return true;
+                if (!hasPermission(user, "polarlogs.command.view")) {
+                    sendMessage(user, "§cYou do not have permission to execute this command!");
+                    return;
                 }
                 String query = args[1];
                 if (query.length() < 2) {
-                    commandSender.sendMessage("§cInvalid query, must start with p: or c:");
-                    return true;
+                    sendMessage(user, "§cInvalid query, must start with p: or c:");
+                    return;
                 }
                 LogQuery logQuery;
                 try {
                     logQuery = LogQuery.parseFrom(query);
                 } catch (IllegalArgumentException e) {
-                    commandSender.sendMessage("§cInvalid time range! See \"trange\" subcommand for valid inputs.");
-                    return true;
+                    sendMessage(user, "§cInvalid time range! See \"trange\" subcommand for valid inputs.");
+                    return;
                 }
                 if (logQuery.context == null && logQuery.player == null) {
-                    commandSender.sendMessage("§cInvalid query. Make sure any player or context names provided are valid.");
-                    return true;
+                    sendMessage(user, "§cInvalid query. Make sure any player or context names provided are valid.");
+                    return;
                 }
                 boolean isPlayerQuery = logQuery.player != null;
                 boolean isContextQuery = logQuery.player == null;
                 String name = isPlayerQuery ? logQuery.player : logQuery.context;
                 String contextFilter = logQuery.context;
                 TimeRange timeRangeFilter = logQuery.timeRange;
-                if (isPlayerQuery && !commandSender.hasPermission("polarlogs.command.view.player")) {
-                    commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                    return true;
+                if (isPlayerQuery && !hasPermission(user, "polarlogs.command.view.player")) {
+                    sendMessage(user, "§cYou do not have permission to execute this command!");
+                    return;
                 }
-                if (isPlayerQuery && contextFilter != null && !commandSender.hasPermission("polarlogs.command.view.player.context")) {
-                    commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                    return true;
+                if (isPlayerQuery && contextFilter != null && !hasPermission(user, "polarlogs.command.view.player.context")) {
+                    sendMessage(user, "§cYou do not have permission to execute this command!");
+                    return;
                 }
-                if (isContextQuery && !commandSender.hasPermission("polarlogs.command.view.context")) {
-                    commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                    return true;
+                if (isContextQuery && !hasPermission(user, "polarlogs.command.view.context")) {
+                    sendMessage(user, "§cYou do not have permission to execute this command!");
+                    return;
                 }
                 String context = polarLogs.getLogs().getContext();
                 if (isPlayerQuery && contextFilter != null) {
@@ -194,57 +195,57 @@ public class PolarLogsCommand extends Command {
                     try {
                         page = Integer.parseInt(args[2]);
                     } catch (NumberFormatException e) {
-                        commandSender.sendMessage("§cInvalid page number!");
-                        return true;
+                        sendMessage(user, "§cInvalid page number!");
+                        return;
                     }
                 }
-                sendPlayerLogs(commandSender, context, isContextQuery ? null : name, timeRangeFilter, page, args);
-                return true;
+                sendPlayerLogs(user, context, isContextQuery ? null : name, timeRangeFilter, page, args);
+                return;
             } else if (args[0].equalsIgnoreCase("export")) {
-                if (!commandSender.hasPermission("polarlogs.command.export")) {
-                    commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                    return true;
+                if (!hasPermission(user, "polarlogs.command.export")) {
+                    sendMessage(user, "§cYou do not have permission to execute this command!");
+                    return;
                 }
                 String query = args[1];
                 if (query.length() < 2) {
-                    commandSender.sendMessage("§cInvalid query, must start with p: or c:");
-                    return true;
+                    sendMessage(user, "§cInvalid query, must start with p: or c:");
+                    return;
                 }
                 LogQuery logQuery;
                 try {
                     logQuery = LogQuery.parseFrom(query);
                 } catch (IllegalArgumentException e) {
-                    commandSender.sendMessage("§cInvalid time range! See \"trange\" subcommand for valid inputs.");
-                    return true;
+                    sendMessage(user, "§cInvalid time range! See \"trange\" subcommand for valid inputs.");
+                    return;
                 }
                 if (logQuery.context == null && logQuery.player == null) {
-                    commandSender.sendMessage("§cInvalid query. Make sure any player or context names provided are valid.");
-                    return true;
+                    sendMessage(user, "§cInvalid query. Make sure any player or context names provided are valid.");
+                    return;
                 }
                 boolean isPlayerQuery = logQuery.player != null;
                 boolean isContextQuery = logQuery.player == null;
                 String name = isPlayerQuery ? logQuery.player : logQuery.context;
                 String contextFilter = logQuery.context;
                 TimeRange timeRangeFilter = logQuery.timeRange;
-                if (isPlayerQuery && !commandSender.hasPermission("polarlogs.command.export.player")) {
-                    commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                    return true;
+                if (isPlayerQuery && !hasPermission(user, "polarlogs.command.export.player")) {
+                    sendMessage(user, "§cYou do not have permission to execute this command!");
+                    return;
                 }
-                if (isPlayerQuery && contextFilter != null && !commandSender.hasPermission("polarlogs.command.export.player.context")) {
-                    commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                    return true;
+                if (isPlayerQuery && contextFilter != null && !hasPermission(user, "polarlogs.command.export.player.context")) {
+                    sendMessage(user, "§cYou do not have permission to execute this command!");
+                    return;
                 }
-                if (isContextQuery && !commandSender.hasPermission("polarlogs.command.export.context")) {
-                    commandSender.sendMessage("§cYou do not have permission to execute this command!");
-                    return true;
+                if (isContextQuery && !hasPermission(user, "polarlogs.command.export.context")) {
+                    sendMessage(user, "§cYou do not have permission to execute this command!");
+                    return;
                 }
                 String context = polarLogs.getLogs().getContext();
                 if (isPlayerQuery && contextFilter != null) {
                     context = contextFilter;
                 }
                 boolean includeDetails = args.length > 2 && args[2].equalsIgnoreCase("includeDetails");
-                exportPlayerLogs(commandSender, context, isContextQuery ? null : name, timeRangeFilter, includeDetails);
-                return true;
+                exportPlayerLogs(user, context, isContextQuery ? null : name, timeRangeFilter, includeDetails);
+                return;
             }
         }
         String helpMessage = PolarLogs.prefix + "§7v" + polarLogs.getDescription().getVersion() + " - Help\n" +
@@ -256,17 +257,16 @@ public class PolarLogsCommand extends Command {
                 PolarLogs.prefix + "§binfo <player> §7- View information about a player\n" +
                 PolarLogs.prefix + "§bview §7- View logs\n" +
                 PolarLogs.prefix + "§bexport §7- Export logs";
-        commandSender.sendMessage(helpMessage);
-        return true;
+        sendMessage(user, helpMessage);
     }
 
-    private void exportPlayerLogs(CommandSender sender, String context, String name, TimeRange timeRange, boolean includeDetails) {
+    private void exportPlayerLogs(User sender, String context, String name, TimeRange timeRange, boolean includeDetails) {
         long exportTime = System.currentTimeMillis();
         String humanExportTime = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date(exportTime));
         PolarLogs.getSpecialUtilityJustForFoliaSpecialNeeds().runAsyncNow(() -> {
             try {
-                sender.sendMessage(PolarLogs.prefix + "§7Exporting logs... (async)");
-                sender.sendMessage(PolarLogs.prefix + "§7Hard limit: 1000 entries");
+                sendMessage(sender, PolarLogs.prefix + "§7Exporting logs... (async)");
+                sendMessage(sender, PolarLogs.prefix + "§7Hard limit: 1000 entries");
                 List<LogEntry> logEntries = polarLogs.getLogs().getLogEntries(context, name, 1000, 0, timeRange);
                 boolean isPlayerExport = name != null;
                 SimpleDateFormat timestampFormat = new SimpleDateFormat(polarLogs.getLogs().getTimestampFormat());
@@ -290,45 +290,45 @@ public class PolarLogsCommand extends Command {
                 File exportFile = new File(exportFolder, fileName);
                 try {
                     Files.write(exportFile.toPath(), fileContent.getBytes());
-                    sender.sendMessage(PolarLogs.prefix + "§7Exported §b" + logEntries.size() + " log entries §7to file §e" + polarLogs.getDataFolder().getPath() + "/exports/" + fileName + " §asuccessfully§7.");
+                    sendMessage(sender, PolarLogs.prefix + "§7Exported §b" + logEntries.size() + " log entries §7to file §e" + polarLogs.getDataFolder().getPath() + "/exports/" + fileName + " §asuccessfully§7.");
                 } catch (IOException e) {
-                    sender.sendMessage(PolarLogs.prefix + "§cFailed to export logs to file! (details in console)");
+                    sendMessage(sender, PolarLogs.prefix + "§cFailed to export logs to file! (details in console)");
                     e.printStackTrace();
                 }
             } catch (SQLException e) {
-                sender.sendMessage("§cContext not found");
+                sendMessage(sender, "§cContext not found");
             }
         });
     }
 
-    public void sendPlayerLogs(CommandSender sender, String context, String name, TimeRange timeRange, int page, String[] args) {
+    public void sendPlayerLogs(User sender, String context, String name, TimeRange timeRange, int page, String[] args) {
         PolarLogs.getSpecialUtilityJustForFoliaSpecialNeeds().runAsyncNow(() -> {
            int entriesPerPage = 10;
             try {
                 int offset = (page - 1) * entriesPerPage;
                 LogCountData logCountData = polarLogs.getLogs().getLogCountData(context, name, timeRange);
                 if (logCountData == null) {
-                    sender.sendMessage("§cPlayer not found in logs or database connection not established!");
+                    sendMessage(sender, "§cPlayer not found in logs or database connection not established!");
                     return;
                 }
                 int totalCount = logCountData.getTotalCount();
                 if (totalCount == 0) {
-                    sender.sendMessage("§cNo logs available.");
+                    sendMessage(sender, "§cNo logs available.");
                     return;
                 }
                 int maxPage = (int) Math.ceil((double) totalCount / entriesPerPage);
                 if (page > maxPage) {
-                    sender.sendMessage("§cInvalid page number! (max: " + maxPage + ")");
+                    sendMessage(sender, "§cInvalid page number! (max: " + maxPage + ")");
                     return;
                 }
                 List<LogEntry> logEntries = polarLogs.getLogs().getLogEntries(context, name, entriesPerPage, offset, timeRange);
                 if (name != null) {
-                    sender.sendMessage("§7Player logs §b" + name + "§7@§b" + context + "§7:");
+                    sendMessage(sender, "§7Player logs §b" + name + "§7@§b" + context + "§7:");
                 } else {
-                    sender.sendMessage("§7Context logs §b" + context + "§7:");
+                    sendMessage(sender, "§7Context logs §b" + context + "§7:");
                 }
                 if (timeRange != null)
-                    sender.sendMessage("§7Time range: §b" + timeRange.formatStart(polarLogs.getLogs().getTimestampFormat()) + " - " + timeRange.formatEnd(polarLogs.getLogs().getTimestampFormat()));
+                    sendMessage(sender, "§7Time range: §b" + timeRange.formatStart(polarLogs.getLogs().getTimestampFormat()) + " - " + timeRange.formatEnd(polarLogs.getLogs().getTimestampFormat()));
                 Logs logs = polarLogs.getLogs();
                 for (LogEntry logEntry : logEntries) {
                     String messageTemplate;
@@ -390,7 +390,7 @@ public class PolarLogsCommand extends Command {
                         Player player = (Player) sender;
                         player.spigot().sendMessage(textComponent);
                     } else {
-                        sender.sendMessage(textComponent.toLegacyText());
+                        sendMessage(sender, textComponent.toLegacyText());
                     }
                 }
                 TextComponent pageComponent = new TextComponent("§7Page §b" + page + "§7/§b" + maxPage);
@@ -412,16 +412,16 @@ public class PolarLogsCommand extends Command {
                     Player player = (Player) sender;
                     player.spigot().sendMessage(pageComponent);
                 } else {
-                    sender.sendMessage(pageComponent.toLegacyText());
+                    sendMessage(sender, pageComponent.toLegacyText());
                 }
-                sender.sendMessage("§7Total entries: §b" + totalCount + " §7- Displaying §b" + logEntries.size() + "§7 entries");
+                sendMessage(sender, "§7Total entries: §b" + totalCount + " §7- Displaying §b" + logEntries.size() + "§7 entries");
             } catch (SQLException e) {
-                sender.sendMessage("§cContext not found");
+                sendMessage(sender, "§cContext not found");
             }
         });
     }
 
-    public void sendPlayerInfo(CommandSender sender, String context, String name) {
+    public void sendPlayerInfo(User sender, String context, String name) {
         PolarLogs.getSpecialUtilityJustForFoliaSpecialNeeds().runAsyncNow(() -> {
             String name2 = name;
             try {
@@ -429,7 +429,7 @@ public class PolarLogsCommand extends Command {
                 if (name2.contains(":")) {
                     String[] split = name2.split(":");
                     if (split.length != 2) {
-                        sender.sendMessage("§cInvalid time range! See \"trange\" subcommand for valid inputs.");
+                        sendMessage(sender, "§cInvalid time range! See \"trange\" subcommand for valid inputs.");
                         return;
                     }
                     name2 = split[0];
@@ -437,19 +437,19 @@ public class PolarLogsCommand extends Command {
                     try {
                         timeRange = TimeRange.parseFromString(trange);
                     } catch (IllegalArgumentException e) {
-                        sender.sendMessage("§cInvalid time range! See \"trange\" subcommand for valid inputs.");
+                        sendMessage(sender, "§cInvalid time range! See \"trange\" subcommand for valid inputs.");
                         return;
                     }
                 }
                 LogCountData logCountData = polarLogs.getLogs().getLogCountData(context, name2, timeRange);
                 if (logCountData == null) {
-                    sender.sendMessage("§cPlayer not found in logs or database connection not established!");
+                    sendMessage(sender, "§cPlayer not found in logs or database connection not established!");
                     return;
                 }
-                sender.sendMessage("§bPolar Logs §8- §7Addon by §cShorty");
+                sendMessage(sender, "§bPolar Logs §8- §7Addon by §cShorty");
                 if (timeRange != null)
-                    sender.sendMessage("§7Time range: §b" + timeRange.formatStart(polarLogs.getLogs().getTimestampFormat()) + " - " + timeRange.formatEnd(polarLogs.getLogs().getTimestampFormat()));
-                sender.sendMessage("§7Player info §b" + name2 + "§7@§b" + context + "§7:");
+                    sendMessage(sender, "§7Time range: §b" + timeRange.formatStart(polarLogs.getLogs().getTimestampFormat()) + " - " + timeRange.formatEnd(polarLogs.getLogs().getTimestampFormat()));
+                sendMessage(sender, "§7Player info §b" + name2 + "§7@§b" + context + "§7:");
                 TextComponent mitigations = new TextComponent("§7- Mitigations: §bx" + logCountData.getMitigations().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isMitigation() ? "" : " §c§o(locally disabled)"));
                 mitigations.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(logCountData.getMitigations().entrySet().stream().map(entry -> "§7" + entry.getKey() + ": §bx" + entry.getValue()).collect(Collectors.joining("\n")))));
                 TextComponent detections = new TextComponent("§7- Detections: §bx" + logCountData.getDetections().values().stream().mapToInt(Integer::intValue).sum() + (polarLogs.getLogs().getStore().isDetection() ? "" : " §c§o(locally disabled)"));
@@ -465,19 +465,19 @@ public class PolarLogsCommand extends Command {
                     player.spigot().sendMessage(cloudDetections);
                     player.spigot().sendMessage(punishments);
                 } else {
-                    sender.sendMessage(mitigations.toLegacyText());
-                    sender.sendMessage(detections.toLegacyText());
-                    sender.sendMessage(cloudDetections.toLegacyText());
-                    sender.sendMessage(punishments.toLegacyText());
+                    sendMessage(sender, mitigations.toLegacyText());
+                    sendMessage(sender, detections.toLegacyText());
+                    sendMessage(sender, cloudDetections.toLegacyText());
+                    sendMessage(sender, punishments.toLegacyText());
                 }
             } catch (SQLException e) {
-                sender.sendMessage("§cContext not found");
+                sendMessage(sender, "§cContext not found");
             }
         });
     }
 
     @Override
-    public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
+    public List<String> onTabComplete(User user, String[] args) {
         if (args.length == 1) {
             return Stream.of("reload", "info", "trange", "webhooks", "view", "export")
                     .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
@@ -527,4 +527,24 @@ public class PolarLogsCommand extends Command {
         return Collections.emptyList();
     }
 
+    private boolean hasPermission(User user, String permission) {
+        if (user == null) {
+            return false; // For now console can't use the command
+        }
+        return user.bukkitPlayer().map(player -> player.hasPermission(permission)).orElse(false);
+    }
+
+    private boolean sendMessage(User user, String message) {
+        CommandSender sender;
+        if (user == null) {
+            sender = Bukkit.getConsoleSender();
+        } else {
+            sender = user.bukkitPlayer().orElse(null);
+        }
+        if (sender == null) {
+            return false;
+        }
+        sender.sendMessage(message);
+        return true;
+    }
 }
