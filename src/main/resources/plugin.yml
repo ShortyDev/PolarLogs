@@ -1,6 +1,6 @@
 name: PolarLogs
 author: ShortyDev
 main: at.shorty.polar.addon.PolarLogs
-version: 2.6.6
+version: 2.7.0
 depend: ['PolarLoader']
 folia-supported: true
