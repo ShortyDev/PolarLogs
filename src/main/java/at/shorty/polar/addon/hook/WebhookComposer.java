@@ -64,7 +64,10 @@ public class WebhookComposer {
 
     public String replaceGlobalPlaceholders(String content, User user, Logs logs) {
         Player bukkitPlayer = user.bukkitPlayer().orElse(null);
-        return content.replace("%PLAYER_NAME%", user.username())
+        String username = user.username();
+        String escapedUsername = username.replace("_", "\\\\_");
+        return content.replaceAll("(?<![/=])%PLAYER_NAME%", java.util.regex.Matcher.quoteReplacement(escapedUsername))
+                .replace("%PLAYER_NAME%", username)
                 .replace("%CONTEXT%", logs.getContext())
                 .replace("%PLAYER_UUID%", user.uuid().toString())
                 .replace("%PLAYER_LATENCY%", String.valueOf(user.connection().latency()))
